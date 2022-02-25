@@ -190,10 +190,38 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
-
-        return false;
+        boolean isOneMove = false;
+        int size = b.size();
+        findOneMove:
+        for (int col = 0; col < size; col += 1) {
+            for (int row = 0; row < size; row += 1) {
+                if (isEmptySpace(b.tile(col, row)) || hasMergeMove(b.tile(col, row), col, row, size, b)) {
+                    isOneMove = true;
+                    break findOneMove;
+                }
+            }
+        }
+        return isOneMove;
+    }
+    /** Return ture if this tile is empty. */
+    public static boolean isEmptySpace(Tile tile) {
+        if (tile == null) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
+    /** Return true if this tile can merge with adjacent tile. */
+    public static boolean hasMergeMove(Tile tile, int col, int row, int size, Board b) {
+        if (((col + 1) < size) && (b.tile(col+1, row).value() == tile.value())) {
+            return true;
+        } else if (((row + 1) < size) && (b.tile(col, row+1).value() == tile.value())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     @Override
      /** Returns the model as a string, used for debugging. */

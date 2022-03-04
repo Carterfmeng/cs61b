@@ -113,6 +113,13 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        this.board.setViewingPerspective(side);
+        for (int c = 0; c < this.board.size(); c += 1) {
+            if (moveOneColumn(c, this.board)) {
+                changed = true;
+            }
+        }
+        this.board.setViewingPerspective(Side.NORTH);
 
         checkGameOver();
         if (changed) {
@@ -120,6 +127,60 @@ public class Model extends Observable {
         }
         return changed;
     }
+
+    /** helper functions for tilt. */
+
+    /** Move all the tiles in column c and Return this row's scores. */
+    public boolean moveOneColumn(int c, Board b) {
+        int size = b.size();
+        int canMoveToTopRow = size - 1;
+        int isMoveScore = -1;
+        boolean isChanged = false;
+
+        for (int r = (size - 1); r >= 0; r -= 1) {
+            isMoveScore = moveOneTile(c, r, b, canMoveToTopRow);
+            if (isMoveScore > 0) {
+                canMoveToTopRow -= 1;
+                isChanged = true;
+                this.score += isMoveScore;
+            } else if (isMoveScore == 0) {
+                canMoveToTopRow -= 1;
+                isChanged = true;
+            } else if (isMoveScore == -2) {
+                isChanged = true;
+            }
+
+        }
+        return isChanged;
+    }
+
+    /** Move one tile to the top position where it can be.
+     * if merge two tiles, return the score,
+     * if stuck(move or not move maybe) , upper tile can't be merged, return 0,
+     * if just move return -2,
+     * if don't move, return -1. */
+    public static int moveOneTile(int c, int r, Board b, int canMoveToTopRow) {
+        Tile t = b.tile(c, r);
+        Tile topTile = b.tile(c, canMoveToTopRow);
+        int score = 0;
+        if (t == null || r == canMoveToTopRow) {
+            return -1;
+        } else if(topTile == null) {
+            b.move(c, canMoveToTopRow, t);
+            return -2;
+        } else if (t != null && topTile.value() == t.value()){
+            score = t.value();
+            b.move(c, canMoveToTopRow, t);
+            return score * 2;
+        } else if (t != null && topTile.value() != t.value()) {
+            b.move(c, canMoveToTopRow - 1, t);
+            return 0;
+        } else {
+            return -1;
+
+        }
+    }
+
 
     /** Checks if the game is over and sets the gameOver variable
      *  appropriately.
@@ -214,9 +275,9 @@ public class Model extends Observable {
 
     /** Return true if this tile can merge with adjacent tile. */
     public static boolean hasMergeMove(Tile tile, int col, int row, int size, Board b) {
-        if (((col + 1) < size) && (b.tile(col+1, row).value() == tile.value())) {
+        if (((col + 1) < size) && (b.tile(col+1, row) != null) && (b.tile(col+1, row).value() == tile.value())) {
             return true;
-        } else if (((row + 1) < size) && (b.tile(col, row+1).value() == tile.value())) {
+        } else if (((row + 1) < size) && (b.tile(col, row+1) != null) && (b.tile(col, row+1).value() == tile.value())) {
             return true;
         } else {
             return false;

@@ -90,8 +90,15 @@ public class DebugExercise2 {
         int[] a = {1, 11, -1, -11};
         int[] b = {3, -3, 2, -1};
 
-
+        System.out.println(args);
         int sumOfElementwiseMaxes = sumOfElementwiseMaxes(a, b);
         System.out.println(sumOfElementwiseMaxes);
+
+        int test = 0;
+        System.out.println(test);
+        test++;
+        System.out.println(test);
+        test++;
+        System.out.println(test);
     }
 }

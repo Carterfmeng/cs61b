@@ -6,6 +6,17 @@ import static org.junit.Assert.*;
 
 /** Performs some basic linked list tests. */
 public class LinkedListDequeTest {
+    @Test
+    /** Adds a few things to the list use addLast() method, check the item one by one **/
+    public void addLast() {
+        LinkedListDeque<Integer> lst = new LinkedListDeque<>();
+        lst.addLast(1);
+        lst.addLast(2);
+        lst.addLast(3);
+        assertEquals((int) lst.sentinel.next.item, 1);
+        assertEquals((int) lst.sentinel.next.next.item, 2);
+        assertEquals((int) lst.sentinel.next.next.next.item, 3);
+    }
 
     @Test
     /** Adds a few things to the list, checking isEmpty() and size() are correct,

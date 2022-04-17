@@ -43,13 +43,25 @@ public class ArrayDeque<ItemType> implements Deque<ItemType>, Iterable<ItemType>
     private void resize(int capacity) {
         ItemType[] newItems = (ItemType[]) new Object[capacity];
         int firstIndex = nextFirst + 1;
-        int firstCopyNum;
+        int copyNum;
         if (nextFirst == items.length - 1) {
             firstIndex = 0;
         }
-        firstCopyNum = size - firstIndex;
-        System.arraycopy(items, firstIndex, newItems, 0, firstCopyNum);
-        System.arraycopy(items, 0, newItems, firstCopyNum, firstIndex);
+        if (capacity > items.length) {
+            copyNum = size - firstIndex;
+            System.arraycopy(items, firstIndex, newItems, 0, copyNum);
+            if (firstIndex != 0) {
+                System.arraycopy(items, 0, newItems, copyNum, firstIndex);
+            }
+        } else {
+            copyNum = items.length - firstIndex;
+            if (size <= copyNum) {
+                System.arraycopy(items, firstIndex, newItems, 0, size);
+            } else {
+                System.arraycopy(items, firstIndex, newItems, 0, size - copyNum);
+                System.arraycopy(items, 0, newItems, size - copyNum, copyNum);
+            }
+        }
         items = newItems;
         nextFirst = items.length - 1;
         nextLast = size;
@@ -118,7 +130,7 @@ public class ArrayDeque<ItemType> implements Deque<ItemType>, Iterable<ItemType>
         items[firstIndex] = null;
         nextFirst = (nextFirst + 1) % items.length;
         size = size - 1;
-        if (size < items.length / 4 && items.length < 16) {
+        if (size < items.length / 4 && items.length >= 16) {
             resize(items.length / 2);
         }
         return removedValue;
@@ -142,7 +154,7 @@ public class ArrayDeque<ItemType> implements Deque<ItemType>, Iterable<ItemType>
             nextLast = items.length - 1;
         }
         size = size - 1;
-        if (size < items.length / 4 && items.length < 16) {
+        if (size < items.length / 4 && items.length >= 16) {
             resize(items.length / 2);
         }
         return removedValue;

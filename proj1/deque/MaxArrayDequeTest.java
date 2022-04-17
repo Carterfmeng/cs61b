@@ -1,9 +1,6 @@
 package deque;
 
-import org.apache.commons.math3.stat.descriptive.rank.Max;
-
 import java.util.Comparator;
-import java.util.concurrent.ConcurrentMap;
 
 public class MaxArrayDequeTest {
 

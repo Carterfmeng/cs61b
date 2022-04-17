@@ -1,6 +1,5 @@
 package deque;
 
-import org.apache.commons.math3.linear.ArrayRealVector;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

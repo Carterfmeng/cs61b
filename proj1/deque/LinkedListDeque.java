@@ -1,8 +1,5 @@
 package deque;
 
-import com.sun.xml.internal.xsom.impl.scd.Iterators;
-import net.sf.saxon.functions.ConstantFunction;
-import net.sf.saxon.om.Item;
 import java.util.Iterator;
 
 public class LinkedListDeque<ItemType> implements Deque<ItemType>, Iterable<ItemType> {

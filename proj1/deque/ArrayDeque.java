@@ -1,7 +1,5 @@
 package deque;
 
-import afu.org.checkerframework.checker.oigj.qual.O;
-import net.sf.saxon.om.Item;
 import java.util.Iterator;
 
 public class ArrayDeque<ItemType> implements Deque<ItemType>, Iterable<ItemType> {
@@ -30,7 +28,6 @@ public class ArrayDeque<ItemType> implements Deque<ItemType>, Iterable<ItemType>
         }
     }
 
-    @SuppressWarnings("unchecked")
     public ArrayDeque() {
         items = (ItemType[]) new Object[8];
         size = 0;
@@ -39,7 +36,6 @@ public class ArrayDeque<ItemType> implements Deque<ItemType>, Iterable<ItemType>
     }
 
     /** resize this ArrayDeque to the capacity size. **/
-    @SuppressWarnings("unchecked")
     private void resize(int capacity) {
         ItemType[] newItems = (ItemType[]) new Object[capacity];
         int firstIndex = nextFirst + 1;

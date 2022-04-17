@@ -1,9 +1,11 @@
 package deque;
 
+import com.sun.xml.internal.xsom.impl.scd.Iterators;
 import net.sf.saxon.functions.ConstantFunction;
 import net.sf.saxon.om.Item;
+import java.util.Iterator;
 
-public class LinkedListDeque<ItemType> {
+public class LinkedListDeque<ItemType> implements Iterable<ItemType> {
     public class Node {
         public Node prev;
         public ItemType item;
@@ -13,6 +15,23 @@ public class LinkedListDeque<ItemType> {
             prev = prevNode;
             item = nodeItem;
             next = nextNode;
+        }
+    }
+    private class LinkedListDequeIterator implements Iterator<ItemType> {
+        private int wizPos;
+        public LinkedListDequeIterator() {
+            wizPos = 0;
+        }
+        @Override
+        public boolean hasNext() {
+            return wizPos < size;
+        }
+
+        @Override
+        public ItemType next() {
+            ItemType returnItem = get(wizPos);
+            wizPos = wizPos + 1;
+            return returnItem;
         }
     }
 
@@ -101,8 +120,40 @@ public class LinkedListDeque<ItemType> {
         }
     }
 
+    public ItemType getRecursive(int index) {
+        if (index >= size) {
+            return null;
+        }
+        return getRecursive(index, sentinel.next);
+    }
+
+    private ItemType getRecursive(int leftIndex, Node tempPointer) {
+        if (leftIndex == 0) {
+            return tempPointer.item;
+        }
+        return getRecursive(leftIndex-1, tempPointer.next);
+    }
+
+    public Iterator<ItemType> iterator() {
+        return new LinkedListDequeIterator();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        LinkedListDeque<ItemType> other = (LinkedListDeque<ItemType>) o;
+        if (this.size != other.size) {
+            return false;
+        }
+        for (int i = 0; i < size; i++) {
+            if (!this.get(i).equals(other.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 
     public static void main(String[] args) {
     }
-
 }

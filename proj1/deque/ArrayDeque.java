@@ -1,13 +1,34 @@
 package deque;
 
+import afu.org.checkerframework.checker.oigj.qual.O;
 import net.sf.saxon.om.Item;
+import java.util.Iterator;
 
-
-public class ArrayDeque<ItemType> {
+public class ArrayDeque<ItemType> implements Iterable<ItemType> {
     public ItemType[] items;
     public int size;
     public int nextFirst;
     public int nextLast;
+
+    private class ArrayDequeIterator implements Iterator<ItemType> {
+        private int wizPos;
+
+        public ArrayDequeIterator() {
+            wizPos = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return wizPos < size;
+        }
+
+        @Override
+        public ItemType next() {
+            ItemType returnItem = get(wizPos);
+            wizPos = wizPos + 1;
+            return returnItem;
+        }
+    }
 
     @SuppressWarnings("unchecked")
     public ArrayDeque() {
@@ -133,7 +154,22 @@ public class ArrayDeque<ItemType> {
         return items[(first + index) % items.length];
     }
 
+    public Iterator<ItemType> iterator() {
+        return new ArrayDequeIterator();
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        ArrayDeque<ItemType> other = (ArrayDeque<ItemType>) o;
 
-
+        if (this.size != other.size) {
+            return false;
+        }
+        for (int i = 0; i < size; i++) {
+            if (!this.get(i).equals(other.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

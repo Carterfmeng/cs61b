@@ -4,7 +4,7 @@ import afu.org.checkerframework.checker.oigj.qual.O;
 import net.sf.saxon.om.Item;
 import java.util.Iterator;
 
-public class ArrayDeque<ItemType> implements Iterable<ItemType> {
+public class ArrayDeque<ItemType> implements Deque<ItemType>, Iterable<ItemType> {
     public ItemType[] items;
     public int size;
     public int nextFirst;
@@ -55,6 +55,7 @@ public class ArrayDeque<ItemType> implements Iterable<ItemType> {
         nextLast = size;
     }
 
+    @Override
     public void addFirst(ItemType item) {
         if (size == items.length) {
             resize(size * 2);
@@ -69,6 +70,7 @@ public class ArrayDeque<ItemType> implements Iterable<ItemType> {
         }
     }
 
+    @Override
     public void addLast(ItemType item) {
         if (size >= items.length) {
             resize(size * 2);
@@ -82,14 +84,12 @@ public class ArrayDeque<ItemType> implements Iterable<ItemType> {
         }
     }
 
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
+    @Override
     public int size() {
         return size;
     }
 
+    @Override
     public void printDeque() {
         int firstIndex = nextFirst + 1;
         if (nextFirst == items.length - 1) {
@@ -104,6 +104,7 @@ public class ArrayDeque<ItemType> implements Iterable<ItemType> {
         }
     }
 
+    @Override
     public ItemType removeFirst() {
         int firstIndex = nextFirst + 1;
         ItemType removedValue;
@@ -123,6 +124,7 @@ public class ArrayDeque<ItemType> implements Iterable<ItemType> {
         return removedValue;
     }
 
+    @Override
     public ItemType removeLast() {
         int lastIndex = nextLast - 1;
         ItemType removedValue;
@@ -146,6 +148,7 @@ public class ArrayDeque<ItemType> implements Iterable<ItemType> {
         return removedValue;
     }
 
+    @Override
     public ItemType get(int index) {
         int first = (nextFirst + 1) % items.length;
         if (index >= size) {
@@ -154,6 +157,7 @@ public class ArrayDeque<ItemType> implements Iterable<ItemType> {
         return items[(first + index) % items.length];
     }
 
+    @Override
     public Iterator<ItemType> iterator() {
         return new ArrayDequeIterator();
     }

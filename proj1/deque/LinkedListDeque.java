@@ -5,7 +5,7 @@ import net.sf.saxon.functions.ConstantFunction;
 import net.sf.saxon.om.Item;
 import java.util.Iterator;
 
-public class LinkedListDeque<ItemType> implements Iterable<ItemType> {
+public class LinkedListDeque<ItemType> implements Deque<ItemType>, Iterable<ItemType> {
     public class Node {
         public Node prev;
         public ItemType item;
@@ -45,6 +45,7 @@ public class LinkedListDeque<ItemType> implements Iterable<ItemType> {
         sentinel.prev = sentinel.next;
     }
 
+    @Override
     public void addFirst(ItemType item) {
         Node temp = sentinel.next;
         sentinel.next = new Node(sentinel, item, temp);
@@ -52,6 +53,7 @@ public class LinkedListDeque<ItemType> implements Iterable<ItemType> {
         size = size + 1;
     }
 
+    @Override
     public void addLast(ItemType item) {
         Node temp = sentinel.prev;
         sentinel.prev.next = new Node(temp, item, sentinel);
@@ -59,17 +61,12 @@ public class LinkedListDeque<ItemType> implements Iterable<ItemType> {
         size = size + 1;
     }
 
-    public boolean isEmpty() {
-        if (size == 0) {
-            return true;
-        }
-        return false;
-    }
-
+    @Override
     public int size() {
         return size;
     }
 
+    @Override
     public void printDeque() {
         int index = 0;
         Node temp = sentinel.next;
@@ -84,6 +81,7 @@ public class LinkedListDeque<ItemType> implements Iterable<ItemType> {
         System.out.println();
     }
 
+    @Override
     public ItemType removeFirst() {
         if (size == 0) {
             return null;
@@ -96,6 +94,7 @@ public class LinkedListDeque<ItemType> implements Iterable<ItemType> {
         }
     }
 
+    @Override
     public ItemType removeLast() {
         if (size == 0 ) {
             return null;
@@ -108,6 +107,7 @@ public class LinkedListDeque<ItemType> implements Iterable<ItemType> {
         }
     }
 
+    @Override
     public ItemType get(int index) {
         if (index >= size) {
             return null;
@@ -134,6 +134,7 @@ public class LinkedListDeque<ItemType> implements Iterable<ItemType> {
         return getRecursive(leftIndex-1, tempPointer.next);
     }
 
+    @Override
     public Iterator<ItemType> iterator() {
         return new LinkedListDequeIterator();
     }

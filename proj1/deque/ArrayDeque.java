@@ -3,15 +3,15 @@ package deque;
 import java.util.Iterator;
 
 public class ArrayDeque<ItemType> implements Deque<ItemType>, Iterable<ItemType> {
-    public ItemType[] items;
-    public int size;
-    public int nextFirst;
-    public int nextLast;
+    private ItemType[] items;
+    private int size;
+    private int nextFirst;
+    private int nextLast;
 
     private class ArrayDequeIterator implements Iterator<ItemType> {
         private int wizPos;
 
-        public ArrayDequeIterator() {
+        ArrayDequeIterator() {
             wizPos = 0;
         }
 
@@ -31,8 +31,8 @@ public class ArrayDeque<ItemType> implements Deque<ItemType>, Iterable<ItemType>
     public ArrayDeque() {
         items = (ItemType[]) new Object[8];
         size = 0;
-        nextFirst = 4; // first index == nextFirst + 1 (if out of boundary, first index = 0);
-        nextLast = 5;     // last index == nextLast - 1 (if out of boundary, last index = length - 1));
+        nextFirst = 4; // first index == nextFirst + 1;
+        nextLast = 5;  // last index == nextLast - 1;
     }
 
     /** resize this ArrayDeque to the capacity size. **/

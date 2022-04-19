@@ -13,9 +13,9 @@ public class LinkedListDequeTest {
         lst.addLast(1);
         lst.addLast(2);
         lst.addLast(3);
-        assertEquals((int) lst.sentinel.next.item, 1);
-        assertEquals((int) lst.sentinel.next.next.item, 2);
-        assertEquals((int) lst.sentinel.next.next.next.item, 3);
+        assertEquals((int) lst.get(0), 1);
+        assertEquals((int) lst.get(1), 2);
+        assertEquals((int) lst.get(2), 3);
     }
 
     @Test

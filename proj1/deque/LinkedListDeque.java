@@ -3,12 +3,12 @@ package deque;
 import java.util.Iterator;
 
 public class LinkedListDeque<ItemType> implements Deque<ItemType>, Iterable<ItemType> {
-    public class Node {
-        public Node prev;
-        public ItemType item;
-        public Node next;
+    private class Node {
+        private Node prev;
+        private ItemType item;
+        private Node next;
 
-        public Node(Node prevNode, ItemType nodeItem, Node nextNode) {
+        Node(Node prevNode, ItemType nodeItem, Node nextNode) {
             prev = prevNode;
             item = nodeItem;
             next = nextNode;
@@ -16,9 +16,11 @@ public class LinkedListDeque<ItemType> implements Deque<ItemType>, Iterable<Item
     }
     private class LinkedListDequeIterator implements Iterator<ItemType> {
         private int wizPos;
-        public LinkedListDequeIterator() {
+
+        LinkedListDequeIterator() {
             wizPos = 0;
         }
+
         @Override
         public boolean hasNext() {
             return wizPos < size;
@@ -32,8 +34,8 @@ public class LinkedListDeque<ItemType> implements Deque<ItemType>, Iterable<Item
         }
     }
 
-    public int size;
-    public Node sentinel;
+    private int size;
+    private Node sentinel;
 
     public LinkedListDeque() {
         size = 0;
@@ -93,7 +95,7 @@ public class LinkedListDeque<ItemType> implements Deque<ItemType>, Iterable<Item
 
     @Override
     public ItemType removeLast() {
-        if (size == 0 ) {
+        if (size == 0) {
             return null;
         } else {
             ItemType last = sentinel.prev.item;
@@ -128,7 +130,7 @@ public class LinkedListDeque<ItemType> implements Deque<ItemType>, Iterable<Item
         if (leftIndex == 0) {
             return tempPointer.item;
         }
-        return getRecursive(leftIndex-1, tempPointer.next);
+        return getRecursive(leftIndex - 1, tempPointer.next);
     }
 
     @Override

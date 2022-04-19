@@ -5,8 +5,8 @@ import java.util.Comparator;
 public class MaxArrayDequeTest {
 
     public static void main(String[] args) {
-        Comparator<Integer> c = new MaxArrayDeque.integerComparator();
-        Comparator<String> c2 = new MaxArrayDeque.stringComparator();
+        Comparator<Integer> c = new MaxArrayDeque.IntegerComparator();
+        Comparator<String> c2 = new MaxArrayDeque.StringComparator();
 
         MaxArrayDeque<Integer> integerArrayDeque = new MaxArrayDeque<>(c);
         integerArrayDeque.addFirst(1);

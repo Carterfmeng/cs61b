@@ -50,7 +50,4 @@ public class GuitarString {
     public double sample() {
         return buffer.get(0);
     }
-
-    public static void main(String[] args) {
-    }
 }

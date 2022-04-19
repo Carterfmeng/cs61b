@@ -3,14 +3,14 @@ package deque;
 import java.util.Comparator;
 
 public class MaxArrayDeque<T> extends ArrayDeque<T> {
-    public static class IntegerComparator implements Comparator<Integer> {
+    private static class IntegerComparator implements Comparator<Integer> {
         @Override
         public int compare(Integer o1, Integer o2) {
             return o1 - o2;
         }
     }
 
-    public static class StringComparator implements Comparator<String> {
+    private static class StringComparator implements Comparator<String> {
         @Override
         public int compare(String o1, String o2) {
             return o1.compareTo(o2);
@@ -19,13 +19,17 @@ public class MaxArrayDeque<T> extends ArrayDeque<T> {
 
     private Comparator<T> firstComparator;
 
-    public MaxArrayDeque() {
-        super();
-    }
-
     public MaxArrayDeque(Comparator<T> c) {
         super();
         firstComparator = c;
+    }
+
+    public static IntegerComparator getIntegerComparator() {
+        return new IntegerComparator();
+    }
+
+    public static StringComparator getStringComparator() {
+        return new StringComparator();
     }
 
     public T max() {

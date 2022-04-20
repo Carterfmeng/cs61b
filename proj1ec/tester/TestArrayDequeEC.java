@@ -2,7 +2,6 @@ package tester;
 
 import static org.junit.Assert.*;
 
-import afu.org.checkerframework.checker.signature.qual.SourceName;
 import edu.princeton.cs.introcs.StdRandom;
 import org.junit.Test;
 import student.StudentArrayDeque;

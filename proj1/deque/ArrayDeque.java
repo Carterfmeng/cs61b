@@ -67,14 +67,13 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     public void addFirst(T item) {
         if (size == items.length) {
             resize(size * 2);
+        }
+        items[nextFirst] = item;
+        size = size + 1;
+        if (nextFirst > 0) {
+            nextFirst = nextFirst - 1;
         } else {
-            items[nextFirst] = item;
-            size = size + 1;
-            if (nextFirst > 0) {
-                nextFirst = nextFirst - 1;
-            } else {
-                nextFirst = items.length - 1;
-            }
+            nextFirst = items.length - 1;
         }
     }
 
@@ -119,7 +118,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if (nextFirst == items.length - 1) {
             firstIndex = 0;
         }
-        if (size == 0) {
+        if (isEmpty()) {
             return null;
         }
         removedValue = items[firstIndex];
@@ -139,7 +138,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if (nextLast == 0) {
             lastIndex = items.length - 1;
         }
-        if (size == 0) {
+        if (isEmpty()) {
             return null;
         }
         removedValue = items[lastIndex];

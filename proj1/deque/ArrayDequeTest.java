@@ -2,6 +2,7 @@ package deque;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import java.lang.Math;
 
 
 /** Performs some basic linked list tests. */
@@ -123,4 +124,42 @@ public class ArrayDequeTest {
             assertEquals("Should have the same value", i, (double) lld1.removeLast(), 0.0);
         }
     }
+
+    @Test
+    public void randomAddTest() {
+        int N = 1000;
+        int dequeSize = 0;
+        ArrayDeque<Integer> ard1 = new ArrayDeque<>();
+
+        for (int i = 0; i < N; i++) {
+            /* generate random number from 0 - 3 .*/
+            int randomOperation = (int) (Math.random() * 4) ;
+            if (randomOperation == 0) {
+                ard1.addFirst(i);
+                dequeSize += 1;
+                assertEquals("Should equal to size", dequeSize, ard1.size());
+            } else if (randomOperation == 1) {
+                ard1.addLast(i);
+                dequeSize += 1;
+                assertEquals("Should equal to size", dequeSize, ard1.size());
+            } else if (randomOperation == 2) {
+                if (!ard1.isEmpty()){
+                    dequeSize -= 1;
+                }
+                ard1.removeFirst();
+                assertEquals("Should equal to size", dequeSize, ard1.size());
+            } else if (randomOperation == 3) {
+                if (!ard1.isEmpty()) {
+                    dequeSize -= 1;
+                }
+                ard1.removeLast();
+                assertEquals("Should equal to size", dequeSize, ard1.size());
+            }
+        }
+
+
+
+
+    }
+
 }

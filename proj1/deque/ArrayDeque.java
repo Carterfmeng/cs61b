@@ -54,8 +54,8 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             if (size <= copyNum) {
                 System.arraycopy(items, firstIndex, newItems, 0, size);
             } else {
-                System.arraycopy(items, firstIndex, newItems, 0, size - copyNum);
-                System.arraycopy(items, 0, newItems, size - copyNum, copyNum);
+                System.arraycopy(items, firstIndex, newItems, 0, copyNum);
+                System.arraycopy(items, 0, newItems, copyNum, size - copyNum);
             }
         }
         items = newItems;

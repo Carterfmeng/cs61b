@@ -156,10 +156,31 @@ public class ArrayDequeTest {
                 assertEquals("Should equal to size", dequeSize, ard1.size());
             }
         }
-
-
-
-
     }
 
+    @Test
+    public void getLastIndex() {
+        ArrayDeque<Integer> ard1 = new ArrayDeque<>();
+        ard1.addFirst(0);
+        ard1.removeFirst();
+        ard1.addLast(2);
+        ard1.addLast(3);
+        ard1.addLast(4);
+        ard1.addLast(5);
+        ard1.addFirst(6);
+        ard1.addLast(7);
+        ard1.addLast(8);
+        ard1.addLast(9);
+        ard1.addLast(10);
+        ard1.removeLast();
+        ard1.removeLast();
+        ard1.addFirst(13);
+        ard1.removeLast();
+        ard1.removeLast();
+        ard1.removeLast();
+        ard1.removeFirst();
+        ard1.addFirst(18);
+        ard1.removeLast();
+        ard1.removeLast();
+    }
 }

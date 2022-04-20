@@ -26,15 +26,15 @@ public class TestArrayDequeEC {
                 errorMessage += "addLast(" + i + ")\n";
             } else if (randomOperationNum == 2) {
                 if (sad1.size() > 0) {
-                    int removedValueStudent = sad1.removeFirst();
-                    int removedValueSolution = ads1.removeFirst();
+                    Integer removedValueStudent = sad1.removeFirst();
+                    Integer removedValueSolution = ads1.removeFirst();
                     errorMessage += "removeFirst()\n";
                     assertEquals(errorMessage, removedValueStudent, removedValueSolution);
                 }
             } else if (randomOperationNum == 3) {
                 if (sad1.size() > 0) {
-                    int removedValueStudent = sad1.removeLast();
-                    int removedValueSolution = ads1.removeLast();
+                    Integer removedValueStudent = sad1.removeLast();
+                    Integer removedValueSolution = ads1.removeLast();
                     errorMessage += "removeLast()\n";
                     assertEquals(errorMessage, removedValueStudent, removedValueSolution);
                 }

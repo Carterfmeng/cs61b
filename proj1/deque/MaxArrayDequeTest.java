@@ -3,10 +3,31 @@ package deque;
 import java.util.Comparator;
 
 public class MaxArrayDequeTest {
+    private static class IntegerComparator implements Comparator<Integer> {
+        @Override
+        public int compare(Integer o1, Integer o2) {
+            return o1 - o2;
+        }
+    }
+
+    private static class StringComparator implements Comparator<String> {
+        @Override
+        public int compare(String o1, String o2) {
+            return o1.compareTo(o2);
+        }
+    }
+
+    private static IntegerComparator getIntegerComparator() {
+        return new IntegerComparator();
+    }
+
+    private static StringComparator getStringComparator() {
+        return new StringComparator();
+    }
 
     public static void main(String[] args) {
-        Comparator<Integer> c = MaxArrayDeque.getIntegerComparator();
-        Comparator<String> c2 = MaxArrayDeque.getStringComparator();
+        Comparator<Integer> c = MaxArrayDequeTest.getIntegerComparator();
+        Comparator<String> c2 = MaxArrayDequeTest.getStringComparator();
 
         MaxArrayDeque<Integer> integerArrayDeque = new MaxArrayDeque<>(c);
         integerArrayDeque.addFirst(1);

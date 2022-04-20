@@ -1,6 +1,9 @@
 package deque;
 
 import org.junit.Test;
+
+import java.lang.reflect.Array;
+
 import static org.junit.Assert.*;
 
 
@@ -148,5 +151,23 @@ public class LinkedListDequeTest {
         test.addLast("Last");
         test.addLast("Last, Last");
         assertEquals(test.getRecursive(1), recursiveItem);
+    }
+
+    @Test
+    public void equalsArrayDequeTest() {
+        LinkedListDeque<Integer> lld = new LinkedListDeque<>();
+        ArrayDeque<Integer> ad = new ArrayDeque<>();
+        LinkedListDeque<Integer> lld2 = new LinkedListDeque<>();
+        ArrayDeque<Integer> ad2 = new ArrayDeque<>();
+        int[] a = {1, 2};
+        lld.addFirst(1);
+        lld.addLast(2);
+        ad.addFirst(1);
+        ad.addLast(2);
+        assertTrue(lld.equals(lld));
+        assertTrue(!lld.equals(a));
+        assertTrue(lld.equals(ad));
+
+
     }
 }

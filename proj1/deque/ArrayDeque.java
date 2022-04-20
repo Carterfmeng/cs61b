@@ -174,8 +174,11 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if (o == null) {
             return false;
         }
-        if (o.getClass() != this.getClass() && o.getClass() != LinkedListDeque.class) {
+        if (!(o instanceof Deque)) {
             return false;
+        }
+        if (o == this) {
+            return true;
         }
         Deque<T> other = (Deque<T>) o;
         if (this.size() != other.size()) {

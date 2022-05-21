@@ -5,6 +5,20 @@ import org.junit.Test;
 
 /** Tests by Brendan Hu, Spring 2015, revised for 2016 by Josh Hug */
 public class TestBSTMap {
+    @Test
+    public void printInorderTest() {
+        BSTMap<String, Integer> a = new BSTMap<>();
+        a.put("m", 1);
+        a.put("b", 2);
+        a.put("r", 3);
+        a.put("a", 2);
+        a.put("f", 2);
+        a.printInOrder();
+        for (String key : a) {
+            System.out.println(key);
+
+        }
+    }
 
   	@Test
     public void sanityGenericsTest() {

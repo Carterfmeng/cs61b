@@ -2,6 +2,8 @@ package bstmap;
 
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 
 public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
@@ -36,6 +38,53 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
                 }
                 return right.get(k);
             }
+        }
+
+        void printInOrder() {
+            if (this.left != null) {
+                this.left.printInOrder();
+            }
+            System.out.print(this.key);
+            System.out.print("  ");
+            System.out.println(this.value);
+            if (this.right != null) {
+                this.right.printInOrder();
+            }
+        }
+    }
+
+    private class BSTMapIterator implements Iterator<K> {
+        LinkedList<K> keys;
+        int wizPos;
+
+        BSTMapIterator(BSTNode node) {
+            keys = new LinkedList<K>();
+            addBSTKeysToList(root);
+            wizPos = 0;
+        }
+
+        void addBSTKeysToList(BSTNode node) {
+            if (node != null) {
+                keys.add(node.key);
+            }
+            if (node.left != null) {
+                addBSTKeysToList(node.left);
+            }
+            if (node.right != null) {
+                addBSTKeysToList(node.right);
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return wizPos < keys.size();
+        }
+
+        @Override
+        public K next() {
+            K returnItem = keys.get(wizPos);
+            wizPos++;
+            return returnItem;
         }
     }
 
@@ -120,6 +169,14 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         return node;
     }
 
+    public void printInOrder() {
+        if (root == null) {
+            System.out.println(root);
+        } else {
+            root.printInOrder();
+        }
+    }
+
     @Override
     public Set<K> keySet() {
         throw new UnsupportedOperationException();
@@ -137,7 +194,17 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     @Override
     public Iterator<K> iterator() {
-        throw new UnsupportedOperationException();
+        if (root == null) {
+            return null;
+        } else {
+            return new BSTMapIterator(root);
+        }
+    }
+
+    public static void main(String[] args) {
+        BSTMap<String, Integer> r = new BSTMap<>();
+        r = null;
+        System.out.println(r);
     }
 }
 

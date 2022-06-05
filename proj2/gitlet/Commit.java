@@ -37,19 +37,39 @@ public class Commit implements Serializable {
         this.message = message;
         Formatter fmt = new Formatter();
         this.timestamp = fmt.format("%1$ta %1$tb %1$td %1$tT %1$tY", new Date(Long.valueOf(time)));
+        this.parent = null;
     }
 
-    public Commit(String message) {
+    public Commit(String message, Commit parent) {
         Date commitDate = new Date();
         this.message = message;
         Formatter fmt = new Formatter();
         this.timestamp = fmt.format("%1$ta %1$tb %1$td %1$tT %1$tY", commitDate);
+        this.parent = parent;
+
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        Commit testCommit = new Commit("test commit");
-        Commit testCommit2 = new Commit("initial commit", 0);
+    public String getMessage() {
+        return this.message;
+    }
 
+    public Formatter getTimestamp() {
+        return this.timestamp;
+    }
+
+    public TreeMap<String, String> getBlobs() {
+        return this.blobs;
+    }
+
+    public Commit getParent() {
+        return this.parent;
+    }
+
+
+
+    public static void main(String[] args) throws InterruptedException {
+        Commit testCommit2 = new Commit("initial commit", 0);
+        Commit testCommit = new Commit("test commit", testCommit2);
         System.out.println(testCommit2.timestamp);
         System.out.println(testCommit.timestamp);
     }

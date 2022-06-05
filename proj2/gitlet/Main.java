@@ -25,6 +25,9 @@ public class Main {
                 break;
             case "add":
                 // TODO: handle the `add [filename]` command
+                validateNumArgsIs("add", args, 2);
+                String filename= args[1];
+                Repository.add(filename);
                 break;
             // TODO: FILL THE REST IN
         }

@@ -73,4 +73,49 @@ public class Repository implements Serializable {
     public static void initGitLet() throws IOException {
         setupPersistence();
     }
+
+    private static boolean isAddFileExists(String fileName) {
+        File thisFile = join(CWD, fileName);
+        if (thisFile.exists()) {
+            return true;
+        }
+        return false;
+    }
+
+    private static String readFileContent(String fileName) {
+        File thisFile = join(CWD, fileName);
+        return readContentsAsString(thisFile);
+    }
+
+    private static Repository getRepo() {
+        Repository repo = readObject(REPO, Repository.class);
+        return repo;
+    }
+
+    public static void add(String fileName) throws IOException {
+        if (!isAddFileExists(fileName)) {
+            System.out.println("File does not exist.");
+            System.exit(0);
+        } else {
+            Repository repo = getRepo();
+            String blobContent = readFileContent(fileName);
+            String blobID = sha1(blobContent);
+            if (!Blob.blobExists(blobID)) {
+                Blob fileBlob = new Blob(fileName, blobID, blobContent);
+                fileBlob.save();
+                repo.stagedForAddition.put(fileName, blobID);
+            } else {
+                /** if the blob is same as last commit, then remove it from
+                 * the stage area, else update the blobID to the middle version;
+                 */
+                File lastCommitDIR = join(OBJECTS_DIR, repo.HEAD.substring(0, 2));
+                File lastCommitFile = join(lastCommitDIR, repo.HEAD.substring(2));
+                Commit lastCommit = readObject(lastCommitFile, Commit.class);
+                while (lastCommit.getBlobs().get(fileName) == null && lastCommit.getParent() != null) {
+                    lastCommit = lastCommit.getParent();
+                }
+                Blob lastCommitBlob = lastCommit.getBlobs().get(fileName);
+            }
+        }
+    }
 }

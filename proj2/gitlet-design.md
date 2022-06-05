@@ -8,15 +8,15 @@ A Java field is a variable inside a class. For instance, in a class representing
 ### Class Repository
 #### Fields 
 
-1. TreeMap<String, Commit>  branches  {branchName: Commit Object}
+1. TreeMap<String, String (Commit)>  branches  {branchName: Commit Object}
 
    default: master 
 
-2. Commit HEAD 
+2. String HEAD 
 
-3. TreeMap<String, Blob> stagedForAddition (can stage multiple files)
+3. TreeMap<String, String (Blob)> stagedForAddition (can stage multiple files)
 
-4. TreeMap<String, Blob> stagedForRemoval(can stage multiple files)
+4. TreeMap<String, String (Blob)> stagedForRemoval(can stage multiple files)
 
    
 
@@ -104,17 +104,19 @@ merge
 
 timestamp for initial commit 00:00:00 UTC, Thursday, 1 January 1970 
 
-1. message
+1. String message
 
-1. commitID
+2. String timestamp 
 
-3. commitTime
+3. TreeMap<String, String (Blob)> blobs   {name: Blob}
 
-4. blobs (TreeMap<String, String>)  {name: file's sha1-hash}
-
-5. mergedParent
+4. Commit parent
 
    
+
+
+
+
 
 ### Class GitletException
 
@@ -154,6 +156,8 @@ CWD
 -----------------------------6ab4(blob)
 
 
+
+![image-20220604171803782](C:\Users\Carter\AppData\Roaming\Typora\typora-user-images\image-20220604171803782.png)
 
 
 

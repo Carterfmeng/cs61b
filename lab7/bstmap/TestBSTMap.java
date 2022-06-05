@@ -18,6 +18,7 @@ public class TestBSTMap {
             System.out.println(key);
 
         }
+        System.out.println(-3 / 2);
     }
 
   	@Test

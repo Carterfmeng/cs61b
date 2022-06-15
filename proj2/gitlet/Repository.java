@@ -44,6 +44,8 @@ public class Repository implements Serializable {
     public Repository() {
         branches = new TreeMap<>();
         branches.put("master", null);
+        stagedForAddition = new TreeMap<>();
+        stagedForRemoval = new TreeMap<>();
     }
 
     public static void setupPersistence() throws IOException {
@@ -99,6 +101,7 @@ public class Repository implements Serializable {
         } else {
             Repository repo = getRepo();
             String blobContent = readFileContent(fileName);
+            /** the sha1-hash id of this file in the working dir.*/
             String blobID = sha1(blobContent);
             if (!Blob.blobExists(blobID)) {
                 Blob fileBlob = new Blob(fileName, blobID, blobContent);
@@ -111,10 +114,22 @@ public class Repository implements Serializable {
                 File lastCommitDIR = join(OBJECTS_DIR, repo.HEAD.substring(0, 2));
                 File lastCommitFile = join(lastCommitDIR, repo.HEAD.substring(2));
                 Commit lastCommit = readObject(lastCommitFile, Commit.class);
-                while (lastCommit.getBlobs().get(fileName) == null && lastCommit.getParent() != null) {
-                    lastCommit = lastCommit.getParent();
+                /** get the same fileName's blob in last commit, if it's not in the last commit, get null .*/
+                TreeMap<String, String> lastCommitBlobs = lastCommit.getBlobs();
+                Boolean containFile = lastCommitBlobs.containsKey(fileName);
+                if (!containFile) {
+                    repo.stagedForAddition.put(fileName, blobID);
+                } else {
+                    String lastCommitBlobID = lastCommitBlobs.get(fileName);
+                    File lastBlobDIR = join(OBJECTS_DIR, lastCommitBlobID.substring(0, 2));
+                    File lastBlobFile = join(lastBlobDIR, lastCommitBlobID.substring(2));
+                    Blob lastBlob = readObject(lastBlobFile, Blob.class);
+                    String lastBlobID = sha1(lastBlob.getBlobContent());
+                    /** if the blob is same as last commit, remove it from the stage area.*/
+                    if (lastBlobID == blobID) {
+                        repo.stagedForAddition.remove(fileName);
+                    }
                 }
-                Blob lastCommitBlob = lastCommit.getBlobs().get(fileName);
             }
         }
     }

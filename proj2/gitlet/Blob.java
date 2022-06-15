@@ -38,6 +38,18 @@ public class Blob implements Dumpable{
         writeContents(blob, this.blobContent);
     }
 
+    public String getFileName() {
+        return this.fileName;
+    }
+
+    public String getBlobID() {
+        return this.blobID;
+    }
+
+    public String getBlobContent() {
+        return this.blobContent;
+    }
+
     @Override
     public void dump() {
 

@@ -1,6 +1,6 @@
 # Gitlet Design Document
 
-**Carter**:
+**Name**: Carter
 
 ## Classes and Data Structures
 A Java field is a variable inside a class. For instance, in a class representing an employee, the Employee class might contain the following fields: name. position. salary.
@@ -113,6 +113,18 @@ timestamp for initial commit 00:00:00 UTC, Thursday, 1 January 1970
 4. Commit parent
 
    
+
+### Class Blob 
+
+#### Fields
+
+1.String fileName
+
+2.String blobID (sha1-hash)
+
+3.String blobContent;
+
+
 
 
 

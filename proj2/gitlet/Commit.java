@@ -26,7 +26,7 @@ public class Commit implements Serializable {
     /** The message of this Commit. */
     private String message;
     /** The commit time.*/
-    private Formatter timestamp;
+    private String timestamp;
     /** The {name: file's sha1-hash} map, to store the reference of the files/blobs in this commit. */
     private TreeMap<String, String> blobs;
     /** The parent commit.*/
@@ -36,7 +36,8 @@ public class Commit implements Serializable {
     public Commit(String message, int time) {
         this.message = message;
         Formatter fmt = new Formatter();
-        this.timestamp = fmt.format("%1$ta %1$tb %1$td %1$tT %1$tY", new Date(Long.valueOf(time)));
+        this.timestamp = fmt.format("%1$ta %1$tb %1$td %1$tT %1$tY", new Date(Long.valueOf(time))).toString();
+        this.blobs = new TreeMap<>();
         this.parent = null;
     }
 
@@ -44,8 +45,9 @@ public class Commit implements Serializable {
         Date commitDate = new Date();
         this.message = message;
         Formatter fmt = new Formatter();
-        this.timestamp = fmt.format("%1$ta %1$tb %1$td %1$tT %1$tY", commitDate);
+        this.timestamp = fmt.format("%1$ta %1$tb %1$td %1$tT %1$tY", commitDate).toString();
         this.parent = parent;
+        this.blobs = parent.blobs;
 
     }
 
@@ -53,7 +55,7 @@ public class Commit implements Serializable {
         return this.message;
     }
 
-    public Formatter getTimestamp() {
+    public String getTimestamp() {
         return this.timestamp;
     }
 

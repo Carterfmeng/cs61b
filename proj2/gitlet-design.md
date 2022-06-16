@@ -89,7 +89,7 @@ reset
 
 - Note that in Gitlet, there is no way to be in a detached head state since there is no `checkout` command that will move the HEAD pointer to a specific commit. The `reset` command will do that, though it also moves the branch pointer. Thus, in Gitlet, you will never be in a detached HEAD state.
 
-![image-20220603183413248](C:\Users\Carter\AppData\Roaming\Typora\typora-user-images\image-20220603183413248.png)
+![image-20220616094121729](gitlet-design.assets/image-20220616094121729.png)
 
 merge
 
@@ -167,9 +167,7 @@ CWD
 
 -----------------------------6ab4(blob)
 
-
-
-![image-20220604171803782](C:\Users\Carter\AppData\Roaming\Typora\typora-user-images\image-20220604171803782.png)
+![image-20220616094206022](gitlet-design.assets/image-20220616094206022.png)
 
 
 

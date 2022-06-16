@@ -1,5 +1,6 @@
 package gitlet;
 
+import java.awt.font.ShapeGraphicAttribute;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -235,5 +236,47 @@ class Utils {
     static void message(String msg, Object... args) {
         System.out.printf(msg, args);
         System.out.println();
+    }
+
+    /** personal extra helper method for persistence.*/
+
+    /** write a commit object to the file in the OBJECTS_DIR.
+     * if the commit already exist, rewrite it,
+     * else make a new file and save it.*/
+    static void writeCommitObject(Commit toWriteCommit) throws IOException {
+        String toWriteCommitID = toWriteCommit.getCommitID();
+        File COMMIT_DIR = join(Repository.OBJECTS_DIR, toWriteCommitID.substring(0, 2));
+        File toWriteCommitFile = join(COMMIT_DIR, toWriteCommitID.substring(2));
+        if (!COMMIT_DIR.exists()) {
+            COMMIT_DIR.mkdir();
+        }
+        if (!toWriteCommitFile.exists()) {
+            toWriteCommitFile.createNewFile();
+        }
+        writeObject(toWriteCommitFile, toWriteCommit);
+    }
+
+    static void readCommitObject(Commit toReadCommit) {
+        String toReadCommitID = toReadCommit.getCommitID();
+        File COMMIT_DIR = join(Repository.OBJECTS_DIR, toReadCommitID.substring(0, 2));
+        File toReadCommitFile = join(COMMIT_DIR, toReadCommitID.substring(2));
+        if (Commit)
+
+    }
+
+    static void writeBranch(String branchName, String commitID) throws IOException {
+        File branchFile = join(Repository.BRANCHES_DIR, branchName);
+        if (!branchFile.exists()) {
+            branchFile.createNewFile();
+        }
+        writeContents(branchFile, commitID);
+    }
+
+    static String readBranch(String branchName, String commitID) {
+        File branchFile = join(Repository.BRANCHES_DIR, branchName);
+        if (branchFile.exists()) {
+            return readContentsAsString(branchFile);
+        }
+        return null;
     }
 }

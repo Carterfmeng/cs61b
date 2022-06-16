@@ -32,30 +32,10 @@ public class Repository implements Serializable {
     public static final File REPO = join(GITLET_DIR, "repo");
     /** the objects directory, which save the commits and files/blobs together. */
     public static final File OBJECTS_DIR = join(GITLET_DIR, "objects");
+    /** the branch directory, where save the different branches' name and lastest commitID.*/
+    public static final File BRANCHES_DIR = join(GITLET_DIR, "refs", "heads");
 
     /* TODO: fill in the rest of this class. */
-
-    /** write a commit object to the file in the OBJECTS_DIR.
-     * if the commit already exist, rewrite it,
-     * else make a new file and save it.*/
-    private static void writeCommitObject(Commit toWriteCommit) throws IOException {
-        String toWriteCommitID = sha1(serialize(toWriteCommit));
-        File COMMIT_DIR = join(OBJECTS_DIR, toWriteCommitID.substring(0, 2));
-        File toWriteCommitFile = join(COMMIT_DIR, toWriteCommitID.substring(2));
-        if (!COMMIT_DIR.exists()) {
-            COMMIT_DIR.mkdir();
-        }
-        if (!toWriteCommitFile.exists()) {
-            toWriteCommitFile.createNewFile();
-        }
-        writeObject(toWriteCommitFile, toWriteCommit);
-    }
-
-    private static void readCommitObject(Commit toReadCommit) {
-
-    }
-
-    private static void writeBranch
 
     public static void initGitLet() throws IOException {
         Commit initialCommit = new Commit("initial commit", 0);
@@ -69,10 +49,11 @@ public class Repository implements Serializable {
             OBJECTS_DIR.mkdir();
             /** compute the sha1-hash of initial commit.*/
             writeCommitObject(initialCommit);
-            /** create the repo instance*/
-            Repository repo = new Repository();
+            /** Create the BRANCHES_DIR: ref/heads directory.*/
+            BRANCHES_DIR.createNewFile();
+            writeBranch("master", initialCommit.getCommitID());
 
-            repo.branches.put("master", initialCommitID);
+            repo.branches.put("master", initialCommit.getCommitID());
             repo.HEAD = initialCommitID;
             REPO.createNewFile();
             writeObject(REPO, repo);

@@ -7,6 +7,9 @@ import java.util.Date; // TODO: You'll likely use this in this class
 import java.util.Formatter;
 import java.util.TreeMap;
 
+import static gitlet.Utils.serialize;
+import static gitlet.Utils.sha1;
+
 /** Represents a gitlet commit object.
  *  TODO: It's a good idea to give a description here of what else this Class
  *  does at a high level.
@@ -67,6 +70,9 @@ public class Commit implements Serializable {
         return this.parent;
     }
 
+    public String getCommitID() {
+        return sha1(serialize(this));
+    }
 
 
     public static void main(String[] args) throws InterruptedException {

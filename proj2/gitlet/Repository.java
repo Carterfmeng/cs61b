@@ -32,23 +32,34 @@ public class Repository implements Serializable {
     public static final File REPO = join(GITLET_DIR, "repo");
     /** the objects directory, which save the commits and files/blobs together. */
     public static final File OBJECTS_DIR = join(GITLET_DIR, "objects");
-    public static final Commit initialCommit = new Commit("initial commit", 0);
-
-    private TreeMap<String, String> branches;
-    private String HEAD;
-    private TreeMap<String, String> stagedForAddition;
-    private TreeMap<String, String> stagedForRemoval;
-
 
     /* TODO: fill in the rest of this class. */
-    public Repository() {
-        branches = new TreeMap<>();
-        branches.put("master", null);
-        stagedForAddition = new TreeMap<>();
-        stagedForRemoval = new TreeMap<>();
+
+    /** write a commit object to the file in the OBJECTS_DIR.
+     * if the commit already exist, rewrite it,
+     * else make a new file and save it.*/
+    private static void writeCommitObject(Commit toWriteCommit) throws IOException {
+        String toWriteCommitID = sha1(serialize(toWriteCommit));
+        File COMMIT_DIR = join(OBJECTS_DIR, toWriteCommitID.substring(0, 2));
+        File toWriteCommitFile = join(COMMIT_DIR, toWriteCommitID.substring(2));
+        if (!COMMIT_DIR.exists()) {
+            COMMIT_DIR.mkdir();
+        }
+        if (!toWriteCommitFile.exists()) {
+            toWriteCommitFile.createNewFile();
+        }
+        writeObject(toWriteCommitFile, toWriteCommit);
     }
 
-    public static void setupPersistence() throws IOException {
+    private static void readCommitObject(Commit toReadCommit) {
+
+    }
+
+    private static void writeBranch
+
+    public static void initGitLet() throws IOException {
+        Commit initialCommit = new Commit("initial commit", 0);
+
         if (GITLET_DIR.exists()) {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             System.exit(0);
@@ -57,23 +68,15 @@ public class Repository implements Serializable {
             GITLET_DIR.mkdir();
             OBJECTS_DIR.mkdir();
             /** compute the sha1-hash of initial commit.*/
-            String initialCommitID = sha1(serialize(initialCommit));
-            File commitDIR = join(OBJECTS_DIR, initialCommitID.substring(0, 2));
-            File initialCommitFile = join(commitDIR, initialCommitID.substring(2));
-            commitDIR.mkdir();
-            initialCommitFile.createNewFile();
-            writeObject(initialCommitFile, initialCommit);
+            writeCommitObject(initialCommit);
             /** create the repo instance*/
             Repository repo = new Repository();
+
             repo.branches.put("master", initialCommitID);
             repo.HEAD = initialCommitID;
             REPO.createNewFile();
             writeObject(REPO, repo);
         }
-    }
-
-    public static void initGitLet() throws IOException {
-        setupPersistence();
     }
 
     private static boolean isAddFileExists(String fileName) {

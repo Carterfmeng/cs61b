@@ -5,7 +5,36 @@
 ## Classes and Data Structures
 A Java field is a variable inside a class. For instance, in a class representing an employee, the Employee class might contain the following fields: name. position. salary.
 
+### Class BranchPointer
+
+#### Fields
+
+String name
+
+String pointedID
+
+
+
+### Class stagedForAdditionArea
+
+#### Fields
+
+TreeMap<String, String (Blob)> stagedAddFiles(can stage multiple files)
+
+
+
+### Class stagedForAdditionArea
+
+#### Fields
+
+TreeMap<String, String (Blob)> stagedRemovalFiles(can stage multiple files)
+
+
+
 ### Class Repository
+
+(don't use it to do persistence job , unless you need to resave it every time you make a change to the repo)
+
 #### Fields 
 
 1. TreeMap<String, String (Commit)>  branches  {branchName: Commit Object}
@@ -13,10 +42,6 @@ A Java field is a variable inside a class. For instance, in a class representing
    default: master 
 
 2. String HEAD 
-
-3. TreeMap<String, String (Blob)> stagedForAddition (can stage multiple files)
-
-4. TreeMap<String, String (Blob)> stagedForRemoval(can stage multiple files)
 
    
 
@@ -157,9 +182,9 @@ CWD
 
 ------ .gitlet
 
---------------repo(the repo object serialized and saved here)
+-------------- ~~repo (the repo object serialized and saved here)~~
 
---------------objects
+--------------objects/
 
 ------------------------6a 
 
@@ -167,9 +192,45 @@ CWD
 
 -----------------------------6ab4(blob)
 
+
+
+----------------HEAD (save the ref == references, eg:   ref/heads/main or dev)  (main's contents: the hash id for a commit);
+
+-----------------refs/
+
+-----------------------heads/
+
+-----------------------branchName1(eg:main)
+
+-----------------------branchName2(eg:dev)
+
+
+
+-----------------indexForAddition
+
+-----------------indexForRemoval
+
+
+
+
+
+
+
+
+
+--------------
+
 ![image-20220616095524209](https://s2.loli.net/2022/06/16/Ct8F9DAVWhJXpm2.png)
 
+## 
 
+## Persistence strategy:
 
+## Key Idea: Give yourself persistence “for free”.
 
+- Try to abstract away persistence as much as possible. 
+
+1. For each *thing* that needs to persist, write a helper method that will load it from your file system and a helper method that will save it to your file system.
+2. You should never have to worry about how or where something is loaded or saved when you are implementing your gitlet commands. * 
+3. Get familiar with the concept of lazy loading and caching.
 

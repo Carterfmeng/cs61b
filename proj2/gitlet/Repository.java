@@ -29,11 +29,13 @@ public class Repository implements Serializable {
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
     /** The repo file which save the serialized repo object. */
-    public static final File REPO = join(GITLET_DIR, "repo");
     /** the objects directory, which save the commits and files/blobs together. */
     public static final File OBJECTS_DIR = join(GITLET_DIR, "objects");
     /** the branch directory, where save the different branches' name and lastest commitID.*/
     public static final File BRANCHES_DIR = join(GITLET_DIR, "refs", "heads");
+    /** The Staging area file. */
+    public static final File STAGED_ADD = join(GITLET_DIR, "addIndex");
+    public static final File STAGED_REM = join(GITLET_DIR, "remIndex");
 
     /* TODO: fill in the rest of this class. */
 
@@ -47,74 +49,58 @@ public class Repository implements Serializable {
             /** Create the directory, and save the initial commit*/
             GITLET_DIR.mkdir();
             OBJECTS_DIR.mkdir();
+            /** create the staging area.*/
+            STAGED_ADD.createNewFile();
+            writeStagingArea(STAGED_ADD, new StagingArea());
+            STAGED_REM.createNewFile();
+            writeStagingArea(STAGED_REM, new StagingArea());
             /** compute the sha1-hash of initial commit.*/
             writeCommitObject(initialCommit);
-            /** Create the BRANCHES_DIR: ref/heads directory.*/
+            /** create the BRANCHES_DIR: ref/heads directory.*/
             BRANCHES_DIR.createNewFile();
-            writeBranch("master", initialCommit.getCommitID());
-
-            repo.branches.put("master", initialCommit.getCommitID());
-            repo.HEAD = initialCommitID;
-            REPO.createNewFile();
-            writeObject(REPO, repo);
+            writeBranch("main", initialCommit.getCommitID());
+            /** create the HEAD file, and save the ref to the corresponding branch file.*/
+            writeHEAD("main");
         }
     }
 
-    private static boolean isAddFileExists(String fileName) {
-        File thisFile = join(CWD, fileName);
-        if (thisFile.exists()) {
-            return true;
-        }
-        return false;
-    }
-
-    private static String readFileContent(String fileName) {
-        File thisFile = join(CWD, fileName);
-        return readContentsAsString(thisFile);
-    }
-
-    private static Repository getRepo() {
-        Repository repo = readObject(REPO, Repository.class);
-        return repo;
-    }
 
     public static void add(String fileName) throws IOException {
+        /** if add fileName don't exist, exit.*/
         if (!isAddFileExists(fileName)) {
             System.out.println("File does not exist.");
             System.exit(0);
+        }
+
+        StagingArea addArea = readStagingArea(STAGED_ADD);
+        //StagingArea remArea = readStagingArea(STAGED_REM);
+        /** use the file name & content to create a blob first, then compute the
+         *  sha1-hash id of this blob object in the working dir.*/
+        String addedBlobContent = readFileContent(fileName);
+        Blob addedBlob = new Blob(fileName, addedBlobContent);
+        String addedBlobID = addedBlob.getBlobID();
+
+        /** if the added file's corresponding blob doesn't exit, create the new blob file.*/
+        if (!Blob.blobExists(addedBlobID)) {
+            addedBlob.save();
+            addArea.getStagedFiles().put(fileName, addedBlobID);
         } else {
-            Repository repo = getRepo();
-            String blobContent = readFileContent(fileName);
-            /** the sha1-hash id of this file in the working dir.*/
-            String blobID = sha1(blobContent);
-            if (!Blob.blobExists(blobID)) {
-                Blob fileBlob = new Blob(fileName, blobID, blobContent);
-                fileBlob.save();
-                repo.stagedForAddition.put(fileName, blobID);
+            /** if the blob is not same as the head commit, update the blobID to the middle version.*/
+            Commit headCommit = readHEAD();
+            /** get the same fileName's blob in last commit, if it's not in the head commit, get null .*/
+            TreeMap<String, String> headCommitBlobs = headCommit.getBlobs();
+            Boolean containFile = headCommitBlobs.containsKey(fileName);
+            if (!containFile) {
+                addArea.getStagedFiles().put(fileName, addedBlobID);
             } else {
-                /** if the blob is same as last commit, then remove it from
-                 * the stage area, else update the blobID to the middle version;
-                 */
-                File lastCommitDIR = join(OBJECTS_DIR, repo.HEAD.substring(0, 2));
-                File lastCommitFile = join(lastCommitDIR, repo.HEAD.substring(2));
-                Commit lastCommit = readObject(lastCommitFile, Commit.class);
-                /** get the same fileName's blob in last commit, if it's not in the last commit, get null .*/
-                TreeMap<String, String> lastCommitBlobs = lastCommit.getBlobs();
-                Boolean containFile = lastCommitBlobs.containsKey(fileName);
-                if (!containFile) {
-                    repo.stagedForAddition.put(fileName, blobID);
-                } else {
-                    String lastCommitBlobID = lastCommitBlobs.get(fileName);
-                    File lastBlobDIR = join(OBJECTS_DIR, lastCommitBlobID.substring(0, 2));
-                    File lastBlobFile = join(lastBlobDIR, lastCommitBlobID.substring(2));
-                    Blob lastBlob = readObject(lastBlobFile, Blob.class);
-                    String lastBlobID = sha1(lastBlob.getBlobContent());
-                    /** if the blob is same as last commit, remove it from the stage area.*/
-                    if (lastBlobID == blobID) {
-                        repo.stagedForAddition.remove(fileName);
-                    }
+                String headCommitBlobID = headCommitBlobs.get(fileName);
+                /** if the blob is same as last commit, remove it from the stage area.*/
+                if (headCommitBlobID == addedBlobID) {
+                    addArea.getStagedFiles().remove(fileName);
                 }
             }
         }
+        /** save the STAGED_ADD file.*/
+        writeStagingArea(STAGED_ADD, addArea);
     }
 }

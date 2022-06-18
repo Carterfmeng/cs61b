@@ -32,7 +32,7 @@ public class Repository implements Serializable {
     /** the objects directory, which save the commits and files/blobs together. */
     public static final File OBJECTS_DIR = join(GITLET_DIR, "objects");
     /** the branch directory, where save the different branches' name and lastest commitID.*/
-    public static final File BRANCHES_DIR = join(GITLET_DIR, "refs", "heads");
+    public static final File BRANCHES_DIR = join(GITLET_DIR,"heads");
     /** The Staging area file. */
     public static final File STAGED_ADD = join(GITLET_DIR, "addIndex");
     public static final File STAGED_REM = join(GITLET_DIR, "remIndex");
@@ -57,7 +57,7 @@ public class Repository implements Serializable {
             /** compute the sha1-hash of initial commit.*/
             writeCommitObject(initialCommit);
             /** create the BRANCHES_DIR: ref/heads directory.*/
-            BRANCHES_DIR.createNewFile();
+            BRANCHES_DIR.mkdir();
             writeBranch("main", initialCommit.getCommitID());
             /** create the HEAD file, and save the ref to the corresponding branch file.*/
             writeHEAD("main");

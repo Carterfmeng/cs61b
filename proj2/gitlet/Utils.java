@@ -335,7 +335,10 @@ class Utils {
             throw new GitletException("The HEAD file doesn't exist");
         }
         File branchFile = new File(readContentsAsString(HEADFile));
-        return readObject(branchFile, Commit.class);
+        String headCommitID = readContentsAsString(branchFile);
+        File HEAD_COMMIT_DIR = join(Repository.OBJECTS_DIR, headCommitID.substring(0,2));
+        File headCommitFile = join(HEAD_COMMIT_DIR, headCommitID.substring(2));
+        return readObject(headCommitFile, Commit.class);
     }
 
     static void writeFileContent(String fileName, Object... contents) {

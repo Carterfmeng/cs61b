@@ -26,14 +26,20 @@ public class Main {
             case "add":
                 // TODO: handle the `add [filename]` command
                 validateNumArgsIs("add", args, 2);
-                String filename = args[1];
-                Repository.add(filename);
+                String fileName = args[1];
+                Repository.add(fileName);
                 break;
             // TODO: FILL THE REST IN
             case "commit":
                 validateNumArgsIs("commit", args, 2);
                 String message = args[1];
                 Repository.commit(message);
+                break;
+            case "rm":
+                validateNumArgsIs("rm", args, 2);
+                String rmFileName = args[1];
+                Repository.rm(rmFileName);
+                break;
         }
     }
 

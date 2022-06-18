@@ -74,7 +74,6 @@ public class Repository implements Serializable {
         }
 
         StagingArea addArea = readStagingArea(STAGED_ADD);
-        //StagingArea remArea = readStagingArea(STAGED_REM);
         /** use the file name & content to create a blob first, then compute the
          *  sha1-hash id of this blob object in the working dir.*/
         String addedBlobContent = readFileContent(fileName);
@@ -143,6 +142,31 @@ public class Repository implements Serializable {
         /** change the head's branch pointer to the fresh commit and save.*/
         File headBranch = readHEADBranch();
         writeContents(headBranch, freshCommit.getCommitID());
+    }
 
+    public static void rm(String rmFileName) {
+        StagingArea addArea = readStagingArea(STAGED_ADD);
+        StagingArea remArea = readStagingArea(STAGED_REM);
+        File rmFile = join(CWD, rmFileName);
+        Commit HEADCommit = readHEADCommit();
+        /** use the file name & content to create a blob first, then compute the
+         *  sha1-hash id of this blob object in the working dir.*/
+        String rmFileContent = readFileContent(rmFileName);
+        Blob rmBlob = new Blob(rmFileName, rmFileContent);
+        String rmBlobID = rmBlob.getBlobID();
+        /** handle the failure cases.*/
+        if (!addArea.getStagedFiles().containsKey(rmFileName) && HEADCommit.getBlobs().containsKey(rmFileName)) {
+            System.out.println("No reason to remove the file.");
+            System.exit(0);
+        }
+
+        if (addArea.getStagedFiles().containsKey(rmFileName)) {
+            addArea.getStagedFiles().remove(rmFileName);
+            writeStagingArea(STAGED_ADD, addArea);
+        } else if (HEADCommit.getBlobs().containsKey(rmFileName)) {
+            remArea.getStagedFiles().put(rmFileName, rmBlobID);
+            writeStagingArea(STAGED_REM, remArea);
+            rmFile.delete();
+        }
     }
 }

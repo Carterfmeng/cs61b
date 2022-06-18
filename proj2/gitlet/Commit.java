@@ -43,15 +43,14 @@ public class Commit implements Serializable {
         this.parentID = null;
     }
 
-    public Commit(String message, String parentID) {
-        Date commitDate = new Date();
+    public Commit(Commit that, String message) {
         this.message = message;
+        Date commitDate = new Date();
         Formatter fmt = new Formatter();
         this.timestamp = fmt.format("%1$ta %1$tb %1$td %1$tT %1$tY", commitDate).toString();
-        this.parentID = parentID;
-        Commit parentCommit = readCommitObject(this.parentID);
-        this.blobs = parentCommit.blobs;
-
+        this.parentID = that.getCommitID();
+        /** deep copy of the parent's blobs.*/
+        this.blobs = new TreeMap<>(that.getBlobs());
     }
 
     public String getMessage() {
@@ -69,6 +68,8 @@ public class Commit implements Serializable {
     public Commit getParent() {
         return readCommitObject(this.parentID);
     }
+
+    public String getParentID() { return this.parentID;}
 
     public String getCommitID() {
         return sha1(serialize(this));

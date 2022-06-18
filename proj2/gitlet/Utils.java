@@ -329,7 +329,7 @@ class Utils {
         writeContents(HEADFile, branchRef);
     }
 
-    static Commit readHEAD() {
+    static Commit readHEADCommit() {
         File HEADFile = join(Repository.GITLET_DIR, "HEAD");
         if (!HEADFile.exists()) {
             throw new GitletException("The HEAD file doesn't exist");
@@ -339,6 +339,15 @@ class Utils {
         File HEAD_COMMIT_DIR = join(Repository.OBJECTS_DIR, headCommitID.substring(0,2));
         File headCommitFile = join(HEAD_COMMIT_DIR, headCommitID.substring(2));
         return readObject(headCommitFile, Commit.class);
+    }
+
+    static File readHEADBranch() {
+        File HEADFile = join(Repository.GITLET_DIR, "HEAD");
+        if (!HEADFile.exists()) {
+            throw new GitletException("The HEAD file doesn't exist");
+        }
+        File branchFile = new File(readContentsAsString(HEADFile));
+        return branchFile;
     }
 
     static void writeFileContent(String fileName, Object... contents) {

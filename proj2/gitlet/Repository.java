@@ -3,6 +3,7 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.TreeMap;
 
 import static gitlet.Utils.*;
@@ -86,7 +87,7 @@ public class Repository implements Serializable {
             addArea.getStagedFiles().put(fileName, addedBlobID);
         } else {
             /** if the blob is not same as the head commit, update the blobID to the middle version.*/
-            Commit headCommit = readHEAD();
+            Commit headCommit = readHEADCommit();
             /** get the same fileName's blob in last commit, if it's not in the head commit, get null .*/
             TreeMap<String, String> headCommitBlobs = headCommit.getBlobs();
             Boolean containFile = headCommitBlobs.containsKey(fileName);
@@ -102,5 +103,46 @@ public class Repository implements Serializable {
         }
         /** save the STAGED_ADD file.*/
         writeStagingArea(STAGED_ADD, addArea);
+    }
+
+    public static void commit(String message) throws IOException {
+        /** handle the failure cases.*/
+        StagingArea addArea = readStagingArea(STAGED_ADD);
+        StagingArea remArea = readStagingArea(STAGED_REM);
+        if (addArea.getStagedFiles().size() == 0 && remArea.getStagedFiles().size() == 0 ) {
+            System.out.println("No changes added to the commit.");
+            System.exit(0);
+        }
+        if (message == "" || message == null ) {
+            System.out.println("Please enter a commit message.");
+            System.exit(0);
+        }
+
+        /** deep copy the commit from the HEAD commit.*/
+        Commit headCommit = readHEADCommit();
+        Commit freshCommit = new Commit(headCommit, message);
+        TreeMap<String, String> addStagedFiles = addArea.getStagedFiles();
+        TreeMap<String, String> remStagedFiles = remArea.getStagedFiles();
+        for (Map.Entry<String, String> entry: addStagedFiles.entrySet()) {
+            /** change the blob's sha1-ID in the addStagedArea.*/
+            freshCommit.getBlobs().put(entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<String, String> entry: remStagedFiles.entrySet()) {
+            /** remove the entry in the remStagedArea.*/
+            freshCommit.getBlobs().remove(entry.getKey());
+        }
+
+        /** save the freshCommit.*/
+        writeCommitObject(freshCommit);
+        /** clear and save the staging area.*/
+        addArea.getStagedFiles().clear();
+        remArea.getStagedFiles().clear();
+        writeStagingArea(STAGED_ADD, addArea);
+        writeStagingArea(STAGED_REM, remArea);
+
+        /** change the head's branch pointer to the fresh commit and save.*/
+        File headBranch = readHEADBranch();
+        writeContents(headBranch, freshCommit.getCommitID());
+
     }
 }

@@ -1,7 +1,6 @@
 package gitlet;
 
 // TODO: any imports you need here
-
 import java.io.Serializable;
 import java.util.Date; // TODO: You'll likely use this in this class
 import java.util.Formatter;
@@ -33,6 +32,8 @@ public class Commit implements Serializable {
     private TreeMap<String, String> blobs;
     /** The parent commit.*/
     private String parentID;
+    /** The second parent ID for the merging commit.*/
+    private String secondParentID;
 
     /* TODO: fill in the rest of this class. */
     public Commit(String message, int time) {
@@ -41,6 +42,7 @@ public class Commit implements Serializable {
         this.timestamp = fmt.format("%1$ta %1$tb %1$td %1$tT %1$tY", new Date(Long.valueOf(time))).toString();
         this.blobs = new TreeMap<>();
         this.parentID = null;
+        this.secondParentID = null;
     }
 
     public Commit(Commit that, String message) {
@@ -49,6 +51,7 @@ public class Commit implements Serializable {
         Formatter fmt = new Formatter();
         this.timestamp = fmt.format("%1$ta %1$tb %1$td %1$tT %1$tY", commitDate).toString();
         this.parentID = that.getCommitID();
+        this.secondParentID = null;
         /** deep copy of the parent's blobs.*/
         this.blobs = new TreeMap<>(that.getBlobs());
     }
@@ -70,6 +73,8 @@ public class Commit implements Serializable {
     }
 
     public String getParentID() { return this.parentID;}
+
+    public String getSecondParentID() { return this.secondParentID; }
 
     public String getCommitID() {
         return sha1(serialize(this));

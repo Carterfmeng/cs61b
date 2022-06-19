@@ -1,6 +1,5 @@
 package gitlet;
 
-import java.awt.font.ShapeGraphicAttribute;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;

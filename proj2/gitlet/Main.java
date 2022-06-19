@@ -40,6 +40,10 @@ public class Main {
                 String rmFileName = args[1];
                 Repository.rm(rmFileName);
                 break;
+            case "log":
+                validateNumArgsIs("log", args, 1);
+                Repository.log();
+                break;
         }
     }
 

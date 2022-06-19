@@ -234,3 +234,12 @@ CWD
 2. You should never have to worry about how or where something is loaded or saved when you are implementing your gitlet commands. * 
 3. Get familiar with the concept of lazy loading and caching.
 
+
+
+4.commit all in one folder: objects/commits/....  (consider the blob also don't split to different folders)
+
+all commit file name is just the full sha1-hash id, not split to different folders, because need to iterate over all the commits when implement global-log and find command;
+
+
+
+consider convert blob object to a just file (write blob content to the file, don't save the name as an instance variable) -- to achieve this, such as in staging area, you need to sha1(staged file's content)  to address the exist blob file;

@@ -171,4 +171,26 @@ public class Repository implements Serializable {
             rmFile.delete();
         }
     }
+
+    public static void log() {
+        Commit HEADCommit = readHEADCommit();
+        /** while the HEADCommit isn't the initial commit (parent != null), print this commit,
+         * then move to the parent commit.*/
+        Commit unLogCommit = HEADCommit;
+        while (unLogCommit.getParentID() != null) {
+            System.out.println("===");
+            System.out.println("commit " + unLogCommit.getCommitID());
+            /** add the Merge info when this is the merge commit.*/
+            if (unLogCommit.getSecondParentID() != null) {
+                String firstParentShortID = unLogCommit.getParentID().substring(0, 7);
+                String secondParentShortID = unLogCommit.getSecondParentID().substring(0, 7);
+                System.out.println("Merge: " + firstParentShortID + " " + secondParentShortID);
+            }
+            System.out.println("Date: " + unLogCommit.getTimestamp());
+            System.out.println(unLogCommit.getMessage());
+            System.out.println();
+            /** move unLogCommit to the parent commit.*/
+            unLogCommit = readCommitObject(unLogCommit.getParentID());
+        }
+    }
 }

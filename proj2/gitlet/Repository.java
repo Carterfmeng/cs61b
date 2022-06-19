@@ -161,7 +161,9 @@ public class Repository implements Serializable {
         }
 
         if (addArea.getStagedFiles().containsKey(rmFileName)) {
+            File deleteBlob = readObjectFileFromID(rmBlobID);
             addArea.getStagedFiles().remove(rmFileName);
+            restrictedDelete(deleteBlob);
             writeStagingArea(STAGED_ADD, addArea);
         } else if (HEADCommit.getBlobs().containsKey(rmFileName)) {
             remArea.getStagedFiles().put(rmFileName, rmBlobID);

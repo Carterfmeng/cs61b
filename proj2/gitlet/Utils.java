@@ -396,6 +396,17 @@ class Utils {
             return true;
         }
         return false;
+    }
 
+    static String readObjectPathFromID(String ID) {
+        File OBJECT_DIR = join(Repository.OBJECTS_DIR, ID.substring(0, 2));
+        File toReadOBJECTFile = join(OBJECT_DIR, ID.substring(2));
+        return toReadOBJECTFile.toString();
+    }
+
+    static File readObjectFileFromID(String ID) {
+        File OBJECT_DIR = join(Repository.OBJECTS_DIR, ID.substring(0, 2));
+        File toReadOBJECTFile = join(OBJECT_DIR, ID.substring(2));
+        return toReadOBJECTFile;
     }
 }

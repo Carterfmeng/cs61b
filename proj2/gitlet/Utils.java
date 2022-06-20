@@ -191,6 +191,17 @@ class Utils {
             };
 
     /**
+     * Filter out all but dir.
+     */
+    private static final FilenameFilter DIR =
+            new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return new File(dir, name).isDirectory();
+                }
+            };
+
+    /**
      * Returns a list of the names of all plain files in the directory DIR, in
      * lexicographic order as Java Strings.  Returns null if DIR does
      * not denote a directory.
@@ -282,7 +293,7 @@ class Utils {
      */
     static void writeCommitObject(Commit toWriteCommit) throws IOException {
         String toWriteCommitID = toWriteCommit.getCommitID();
-        File COMMIT_DIR = join(Repository.OBJECTS_DIR, toWriteCommitID.substring(0, 2));
+        File COMMIT_DIR = join(Repository.COMMITS_DIR, toWriteCommitID.substring(0, 2));
         File toWriteCommitFile = join(COMMIT_DIR, toWriteCommitID.substring(2));
         if (!COMMIT_DIR.exists()) {
             COMMIT_DIR.mkdir();
@@ -294,7 +305,10 @@ class Utils {
     }
 
     static Commit readCommitObject(String toReadCommitID) {
-        File COMMIT_DIR = join(Repository.OBJECTS_DIR, toReadCommitID.substring(0, 2));
+        if (toReadCommitID == null) {
+            return null;
+        }
+        File COMMIT_DIR = join(Repository.COMMITS_DIR, toReadCommitID.substring(0, 2));
         File toReadCommitFile = join(COMMIT_DIR, toReadCommitID.substring(2));
         if (!toReadCommitFile.exists()) {
             throw new GitletException("The Commit doesn't exist");
@@ -335,7 +349,7 @@ class Utils {
         }
         File branchFile = new File(readContentsAsString(HEADFile));
         String headCommitID = readContentsAsString(branchFile);
-        File HEAD_COMMIT_DIR = join(Repository.OBJECTS_DIR, headCommitID.substring(0,2));
+        File HEAD_COMMIT_DIR = join(Repository.COMMITS_DIR, headCommitID.substring(0,2));
         File headCommitFile = join(HEAD_COMMIT_DIR, headCommitID.substring(2));
         return readObject(headCommitFile, Commit.class);
     }
@@ -369,7 +383,7 @@ class Utils {
 
     static void writeBlob(Blob toWriteBlob) throws IOException {
         String toWriteBlobID = toWriteBlob.getBlobID();
-        File BLOB_DIR = join(Repository.OBJECTS_DIR, toWriteBlobID.substring(0, 2));
+        File BLOB_DIR = join(Repository.BLOBS_DIR, toWriteBlobID.substring(0, 2));
         File toWriteBlobFile = join(BLOB_DIR, toWriteBlobID.substring(2));
         if (!BLOB_DIR.exists()) {
             BLOB_DIR.mkdir();
@@ -381,7 +395,7 @@ class Utils {
     }
 
     static Blob readBlob(String toReadBlobID) {
-        File BLOB_DIR = join(Repository.OBJECTS_DIR, toReadBlobID.substring(0, 2));
+        File BLOB_DIR = join(Repository.BLOBS_DIR, toReadBlobID.substring(0, 2));
         File toReadBlobFile = join(BLOB_DIR, toReadBlobID.substring(2));
         if (!toReadBlobFile.exists()) {
             throw new GitletException("The Blob doesn't exit");
@@ -397,14 +411,14 @@ class Utils {
         return false;
     }
 
-    static String readObjectPathFromID(String ID) {
-        File OBJECT_DIR = join(Repository.OBJECTS_DIR, ID.substring(0, 2));
+    static String readObjectPathFromID(String ID, File DIR) {
+        File OBJECT_DIR = join(DIR, ID.substring(0, 2));
         File toReadOBJECTFile = join(OBJECT_DIR, ID.substring(2));
         return toReadOBJECTFile.toString();
     }
 
-    static File readObjectFileFromID(String ID) {
-        File OBJECT_DIR = join(Repository.OBJECTS_DIR, ID.substring(0, 2));
+    static File readObjectFileFromID(String ID, File DIR) {
+        File OBJECT_DIR = join(DIR, ID.substring(0, 2));
         File toReadOBJECTFile = join(OBJECT_DIR, ID.substring(2));
         return toReadOBJECTFile;
     }

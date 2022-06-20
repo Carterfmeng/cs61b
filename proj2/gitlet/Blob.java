@@ -29,7 +29,7 @@ public class Blob implements Dumpable{
     /** if a blobExists, it must be the same, because the content is the same with
      * the same sha1-hash.*/
     public static boolean blobExists(String blobID) {
-        File blob = join(Repository.OBJECTS_DIR, blobID.substring(0,2), blobID.substring(2));
+        File blob = join(Repository.BLOBS_DIR, blobID.substring(0,2), blobID.substring(2));
         if (blob.exists()) {
             return true;
         }
@@ -37,7 +37,7 @@ public class Blob implements Dumpable{
     }
 
     public void save() throws IOException {
-        File blobDIR = join (Repository.OBJECTS_DIR, getBlobID().substring(0, 2));
+        File blobDIR = join (Repository.BLOBS_DIR, getBlobID().substring(0, 2));
         File blob = join(blobDIR, getBlobID().substring(2));
         if (!blobDIR.exists()) {
             blobDIR.mkdir();

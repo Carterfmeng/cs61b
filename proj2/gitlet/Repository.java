@@ -29,9 +29,12 @@ public class Repository implements Serializable {
     public static final File CWD = new File(System.getProperty("user.dir"));
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
-    /** The repo file which save the serialized repo object. */
-    /** the objects directory, which save the commits and files/blobs together. */
+    /** the objects directory, which save the commits and files/blobs in two respective dir. */
     public static final File OBJECTS_DIR = join(GITLET_DIR, "objects");
+    /** the commits dir .*/
+    public static final File COMMITS_DIR = join(OBJECTS_DIR, "commits");
+    /** the blobs dir .*/
+    public static final  File BLOBS_DIR = join(OBJECTS_DIR, "blobs");
     /** the branch directory, where save the different branches' name and lastest commitID.*/
     public static final File BRANCHES_DIR = join(GITLET_DIR,"heads");
     /** The Staging area file. */
@@ -47,9 +50,10 @@ public class Repository implements Serializable {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             System.exit(0);
         } else {
-            /** Create the directory, and save the initial commit*/
+            /* Create the directory, and save the initial commit.*/
             GITLET_DIR.mkdir();
-            OBJECTS_DIR.mkdir();
+            COMMITS_DIR.mkdirs();
+            BLOBS_DIR.mkdir();
             /** create the staging area.*/
             STAGED_ADD.createNewFile();
             writeStagingArea(STAGED_ADD, new StagingArea());
@@ -161,7 +165,7 @@ public class Repository implements Serializable {
         }
 
         if (addArea.getStagedFiles().containsKey(rmFileName)) {
-            File deleteBlob = readObjectFileFromID(rmBlobID);
+            File deleteBlob = readObjectFileFromID(rmBlobID, BLOBS_DIR);
             addArea.getStagedFiles().remove(rmFileName);
             restrictedDelete(deleteBlob);
             writeStagingArea(STAGED_ADD, addArea);
@@ -177,7 +181,7 @@ public class Repository implements Serializable {
         /** while the HEADCommit isn't the initial commit (parent != null), print this commit,
          * then move to the parent commit.*/
         Commit unLogCommit = HEADCommit;
-        while (unLogCommit.getParentID() != null) {
+        while (unLogCommit != null) {
             System.out.println("===");
             System.out.println("commit " + unLogCommit.getCommitID());
             /** add the Merge info when this is the merge commit.*/

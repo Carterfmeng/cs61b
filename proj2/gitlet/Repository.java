@@ -159,8 +159,9 @@ public class Repository implements Serializable {
         Blob rmBlob = new Blob(rmFileName, rmFileContent);
         String rmBlobID = rmBlob.getBlobID();
         /** handle the failure cases.*/
-        if (!addArea.getStagedFiles().containsKey(rmFileName) && HEADCommit.getBlobs().containsKey(rmFileName)) {
+        if (!addArea.getStagedFiles().containsKey(rmFileName) && !HEADCommit.getBlobs().containsKey(rmFileName)) {
             System.out.println("No reason to remove the file.");
+            System.out.println(HEADCommit.getBlobs());
             System.exit(0);
         }
 

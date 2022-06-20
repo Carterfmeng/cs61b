@@ -175,23 +175,28 @@ public class Repository implements Serializable {
         }
     }
 
+    /** the helper method to print a commit's log.*/
+    private static void printCommitLog(Commit toPrintCommit) {
+        System.out.println("===");
+        System.out.println("commit " + toPrintCommit.getCommitID());
+        /** add the Merge info when this is the merge commit.*/
+        if (toPrintCommit.getSecondParentID() != null) {
+            String firstParentShortID = toPrintCommit.getParentID().substring(0, 7);
+            String secondParentShortID = toPrintCommit.getSecondParentID().substring(0, 7);
+            System.out.println("Merge: " + firstParentShortID + " " + secondParentShortID);
+        }
+        System.out.println("Date: " + toPrintCommit.getTimestamp());
+        System.out.println(toPrintCommit.getMessage());
+        System.out.println();
+    }
+
     public static void log() {
         Commit HEADCommit = readHEADCommit();
         /** while the HEADCommit isn't the initial commit (parent != null), print this commit,
          * then move to the parent commit.*/
         Commit unLogCommit = HEADCommit;
         while (unLogCommit != null) {
-            System.out.println("===");
-            System.out.println("commit " + unLogCommit.getCommitID());
-            /** add the Merge info when this is the merge commit.*/
-            if (unLogCommit.getSecondParentID() != null) {
-                String firstParentShortID = unLogCommit.getParentID().substring(0, 7);
-                String secondParentShortID = unLogCommit.getSecondParentID().substring(0, 7);
-                System.out.println("Merge: " + firstParentShortID + " " + secondParentShortID);
-            }
-            System.out.println("Date: " + unLogCommit.getTimestamp());
-            System.out.println(unLogCommit.getMessage());
-            System.out.println();
+            printCommitLog(unLogCommit);
             /** move unLogCommit to the parent commit.*/
             unLogCommit = readCommitObject(unLogCommit.getParentID());
         }
@@ -205,17 +210,7 @@ public class Repository implements Serializable {
             for (String commit: allCommitsInDir) {
                 File toLogCommitFile = join(COMMITS_DIR, dir, commit);
                 Commit toLogCommit = readObject(toLogCommitFile, Commit.class);
-                System.out.println("===");
-                System.out.println("commit " + toLogCommit.getCommitID());
-                /** add the Merge info when this is the merge commit.*/
-                if (toLogCommit.getSecondParentID() != null) {
-                    String firstParentShortID = toLogCommit.getParentID().substring(0, 7);
-                    String secondParentShortID = toLogCommit.getSecondParentID().substring(0, 7);
-                    System.out.println("Merge: " + firstParentShortID + " " + secondParentShortID);
-                }
-                System.out.println("Date: " + toLogCommit.getTimestamp());
-                System.out.println(toLogCommit.getMessage());
-                System.out.println();
+                printCommitLog(toLogCommit);
             }
         }
     }

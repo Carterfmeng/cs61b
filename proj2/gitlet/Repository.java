@@ -81,12 +81,11 @@ public class Repository implements Serializable {
         /** use the file name & content to create a blob first, then compute the
          *  sha1-hash id of this blob object in the working dir.*/
         String addedBlobContent = readFileContent(fileName);
-        Blob addedBlob = new Blob(fileName, addedBlobContent);
-        String addedBlobID = addedBlob.getBlobID();
+        String addedBlobID = getBlobID(addedBlobContent);
 
         /** if the added file's corresponding blob doesn't exit, create the new blob file.*/
-        if (!Blob.blobExists(addedBlobID)) {
-            addedBlob.save();
+        if (!blobExist(addedBlobID)) {
+            writeBlob(addedBlobContent, addedBlobID);
             addArea.getStagedFiles().put(fileName, addedBlobID);
         } else {
             /** if the blob is not same as the head commit, update the blobID to the middle version.*/
@@ -156,17 +155,15 @@ public class Repository implements Serializable {
         /** use the file name & content to create a blob first, then compute the
          *  sha1-hash id of this blob object in the working dir.*/
         String rmFileContent = readFileContent(rmFileName);
-        Blob rmBlob = new Blob(rmFileName, rmFileContent);
-        String rmBlobID = rmBlob.getBlobID();
+        String rmBlobID = getBlobID(rmFileContent);
         /** handle the failure cases.*/
         if (!addArea.getStagedFiles().containsKey(rmFileName) && !HEADCommit.getBlobs().containsKey(rmFileName)) {
             System.out.println("No reason to remove the file.");
-            System.out.println(HEADCommit.getBlobs());
             System.exit(0);
         }
 
         if (addArea.getStagedFiles().containsKey(rmFileName)) {
-            File deleteBlob = readObjectFileFromID(rmBlobID, BLOBS_DIR);
+            File deleteBlob = readBlobFile(rmBlobID);
             addArea.getStagedFiles().remove(rmFileName);
             restrictedDelete(deleteBlob);
             writeStagingArea(STAGED_ADD, addArea);
@@ -198,4 +195,6 @@ public class Repository implements Serializable {
             unLogCommit = readCommitObject(unLogCommit.getParentID());
         }
     }
+
+
 }

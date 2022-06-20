@@ -381,8 +381,20 @@ class Utils {
         return readObject(indexFile, StagingArea.class);
     }
 
-    static void writeBlob(Blob toWriteBlob) throws IOException {
-        String toWriteBlobID = toWriteBlob.getBlobID();
+    static boolean blobExist(String blobID) {
+        File blob = join(Repository.BLOBS_DIR, blobID.substring(0, 2), blobID.substring(2));
+        if (blob.exists()) {
+            return true;
+        }
+        return false;
+    }
+
+    static String getBlobID(String blobContent) {
+        return sha1(blobContent);
+    }
+
+    static void writeBlob(String blobContent) throws IOException {
+        String toWriteBlobID = sha1(blobContent);
         File BLOB_DIR = join(Repository.BLOBS_DIR, toWriteBlobID.substring(0, 2));
         File toWriteBlobFile = join(BLOB_DIR, toWriteBlobID.substring(2));
         if (!BLOB_DIR.exists()) {
@@ -391,16 +403,29 @@ class Utils {
         if (!toWriteBlobFile.exists()) {
             toWriteBlobFile.createNewFile();
         }
-        writeObject(toWriteBlobFile, toWriteBlob);
+        writeContents(toWriteBlobFile, blobContent);
     }
 
-    static Blob readBlob(String toReadBlobID) {
+    static void writeBlob(String blobContent, String blobID) throws IOException {
+        String toWriteBlobID = blobID;
+        File BLOB_DIR = join(Repository.BLOBS_DIR, toWriteBlobID.substring(0, 2));
+        File toWriteBlobFile = join(BLOB_DIR, toWriteBlobID.substring(2));
+        if (!BLOB_DIR.exists()) {
+            BLOB_DIR.mkdir();
+        }
+        if (!toWriteBlobFile.exists()) {
+            toWriteBlobFile.createNewFile();
+        }
+        writeContents(toWriteBlobFile, blobContent);
+    }
+
+    static File readBlobFile(String toReadBlobID) {
         File BLOB_DIR = join(Repository.BLOBS_DIR, toReadBlobID.substring(0, 2));
         File toReadBlobFile = join(BLOB_DIR, toReadBlobID.substring(2));
         if (!toReadBlobFile.exists()) {
             throw new GitletException("The Blob doesn't exit");
         }
-        return readObject(toReadBlobFile, Blob.class);
+        return new File(readContentsAsString(toReadBlobFile));
     }
 
     static boolean isAddFileExists(String fileName) {

@@ -44,6 +44,10 @@ public class Main {
                 validateNumArgsIs("log", args, 1);
                 Repository.log();
                 break;
+            case "global-log":
+                validateNumArgsIs("global-log", args, 1);
+                Repository.globalLog();
+                break;
         }
     }
 

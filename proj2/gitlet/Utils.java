@@ -217,12 +217,37 @@ class Utils {
     }
 
     /**
+     * Returns a list of the names of all dirs in the directory DIR, in
+     * lexicographic order as Java Strings.  Returns null if DIR does
+     * not denote a directory.
+     */
+    static List<String> DIRsIn(File dir) {
+        String[] files = dir.list(DIR);
+        if (files == null) {
+            return null;
+        } else {
+            Arrays.sort(files);
+            return Arrays.asList(files);
+        }
+    }
+
+
+    /**
      * Returns a list of the names of all plain files in the directory DIR, in
      * lexicographic order as Java Strings.  Returns null if DIR does
      * not denote a directory.
      */
     static List<String> plainFilenamesIn(String dir) {
         return plainFilenamesIn(new File(dir));
+    }
+
+    /**
+     * Returns a list of the names of all dirs in the directory DIR, in
+     * lexicographic order as Java Strings.  Returns null if DIR does
+     * not denote a directory.
+     */
+    static List<String> DIRsIn(String dir) {
+        return DIRsIn(new File(dir));
     }
 
     /* OTHER FILE UTILITIES */

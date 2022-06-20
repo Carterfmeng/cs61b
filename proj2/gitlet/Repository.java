@@ -1,8 +1,11 @@
 package gitlet;
 
+import edu.princeton.cs.algs4.StdIn;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -56,9 +59,9 @@ public class Repository implements Serializable {
             BLOBS_DIR.mkdir();
             /** create the staging area.*/
             STAGED_ADD.createNewFile();
-            writeStagingArea(STAGED_ADD, new StagingArea());
+            writeStagingArea(STAGED_ADD, new StagingArea(STAGED_ADD));
             STAGED_REM.createNewFile();
-            writeStagingArea(STAGED_REM, new StagingArea());
+            writeStagingArea(STAGED_ADD, new StagingArea(STAGED_ADD));
             /** compute the sha1-hash of initial commit.*/
             writeCommitObject(initialCommit);
             /** create the BRANCHES_DIR: ref/heads directory.*/
@@ -137,10 +140,8 @@ public class Repository implements Serializable {
         /** save the freshCommit.*/
         writeCommitObject(freshCommit);
         /** clear and save the staging area.*/
-        addArea.getStagedFiles().clear();
-        remArea.getStagedFiles().clear();
-        writeStagingArea(STAGED_ADD, addArea);
-        writeStagingArea(STAGED_REM, remArea);
+        addArea.dump();
+        remArea.dump();
 
         /** change the head's branch pointer to the fresh commit and save.*/
         File headBranch = readHEADBranch();
@@ -195,6 +196,12 @@ public class Repository implements Serializable {
             unLogCommit = readCommitObject(unLogCommit.getParentID());
         }
     }
+
+    public static void globalLog() {
+        List<String> allCommitsDirs = DIRsIn(COMMITS_DIR);
+
+    }
+
 
 
 }

@@ -234,4 +234,49 @@ public class Repository implements Serializable {
             System.exit(0);
         }
     }
+
+    public static void status() {
+        /** read the persistence files to get the status contents.*/
+        /** branches. */
+        List<String> branchNames = plainFilenamesIn(BRANCHES_DIR);
+        File HEADBranch = readHEADBranch();
+        String HEADBranchPath = HEADBranch.toString();
+        /** StagingArea .*/
+        StagingArea addArea = readStagingArea(STAGED_ADD);
+        StagingArea remArea = readStagingArea(STAGED_REM);
+        /** TODO: read the Modifications Not Staged For Commit
+         *  TODO: read the Untracked Files .*/
+
+        /** print Branches. */
+        System.out.println("=== Branches ===");
+        for (String branchName: branchNames) {
+            /** if the branch is the head branch, print an asterisk. */
+            if (HEADBranchPath.contains(branchName)) {
+                System.out.print("*");
+            }
+            System.out.println(branchName);
+        }
+        System.out.println();
+        /** print Staged Files. */
+        TreeMap<String, String> addStagedFiles = addArea.getStagedFiles();
+        System.out.println("=== Staged Files ===");
+        for (Map.Entry<String, String> entry: addStagedFiles.entrySet()) {
+            System.out.println(entry.getKey());
+        }
+        System.out.println();
+        /** print Removed Files. */
+        System.out.println("=== Removed Files ===");
+        TreeMap<String, String> remStagedFiles = remArea.getStagedFiles();
+        for (Map.Entry<String, String> entry: remStagedFiles.entrySet()) {
+            /** remove the entry in the remStagedArea.*/
+            System.out.println(entry.getKey());
+        }
+        System.out.println();
+        /** print Modifications Not Staged For Commit. */
+        System.out.println("=== Modifications Not Staged For Commit ===");
+        System.out.println();
+        /** print Untracked Files. */
+        System.out.println("=== Untracked Files ===");
+        System.out.println();
+    }
 }

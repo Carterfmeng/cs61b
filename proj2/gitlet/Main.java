@@ -53,6 +53,9 @@ public class Main {
                 String findMessage = args[1];
                 Repository.find(findMessage);
                 break;
+            case "status":
+                validateNumArgsIs("status", args, 1);
+                Repository.status();
         }
     }
 

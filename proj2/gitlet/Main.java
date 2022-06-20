@@ -48,6 +48,11 @@ public class Main {
                 validateNumArgsIs("global-log", args, 1);
                 Repository.globalLog();
                 break;
+            case "find":
+                validateNumArgsIs("find", args, 2);
+                String findMessage = args[1];
+                Repository.find(findMessage);
+                break;
         }
     }
 

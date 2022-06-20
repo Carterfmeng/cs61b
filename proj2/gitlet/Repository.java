@@ -61,7 +61,7 @@ public class Repository implements Serializable {
             STAGED_ADD.createNewFile();
             writeStagingArea(STAGED_ADD, new StagingArea(STAGED_ADD));
             STAGED_REM.createNewFile();
-            writeStagingArea(STAGED_ADD, new StagingArea(STAGED_ADD));
+            writeStagingArea(STAGED_REM, new StagingArea(STAGED_REM));
             /** compute the sha1-hash of initial commit.*/
             writeCommitObject(initialCommit);
             /** create the BRANCHES_DIR: ref/heads directory.*/
@@ -204,7 +204,6 @@ public class Repository implements Serializable {
 
     public static void globalLog() {
         List<String> allCommitsDirs = DIRsIn(COMMITS_DIR);
-        System.out.println(allCommitsDirs);
         for (String dir: allCommitsDirs) {
             List<String> allCommitsInDir = plainFilenamesIn(join(COMMITS_DIR, dir));
             for (String commit: allCommitsInDir) {
@@ -215,6 +214,24 @@ public class Repository implements Serializable {
         }
     }
 
-
-
+    public static void find(String findMessage) {
+        List<String> allCommitsDirs = DIRsIn(COMMITS_DIR);
+        int existCommitNum = 0;
+        for (String dir: allCommitsDirs) {
+            List<String> allCommitsInDir = plainFilenamesIn(join(COMMITS_DIR, dir));
+            for (String commit: allCommitsInDir) {
+                File toLogCommitFile = join(COMMITS_DIR, dir, commit);
+                Commit toLogCommit = readObject(toLogCommitFile, Commit.class);
+                if (toLogCommit.getMessage().contains(findMessage)) {
+                    System.out.println(toLogCommit.getCommitID());
+                    existCommitNum++;
+                }
+            }
+        }
+        /** handle the failure case.*/
+        if (existCommitNum == 0) {
+            System.out.println("Found no commit with that message.");
+            System.exit(0);
+        }
+    }
 }

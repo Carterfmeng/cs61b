@@ -199,7 +199,25 @@ public class Repository implements Serializable {
 
     public static void globalLog() {
         List<String> allCommitsDirs = DIRsIn(COMMITS_DIR);
-
+        System.out.println(allCommitsDirs);
+        for (String dir: allCommitsDirs) {
+            List<String> allCommitsInDir = plainFilenamesIn(join(COMMITS_DIR, dir));
+            for (String commit: allCommitsInDir) {
+                File toLogCommitFile = join(COMMITS_DIR, dir, commit);
+                Commit toLogCommit = readObject(toLogCommitFile, Commit.class);
+                System.out.println("===");
+                System.out.println("commit " + toLogCommit.getCommitID());
+                /** add the Merge info when this is the merge commit.*/
+                if (toLogCommit.getSecondParentID() != null) {
+                    String firstParentShortID = toLogCommit.getParentID().substring(0, 7);
+                    String secondParentShortID = toLogCommit.getSecondParentID().substring(0, 7);
+                    System.out.println("Merge: " + firstParentShortID + " " + secondParentShortID);
+                }
+                System.out.println("Date: " + toLogCommit.getTimestamp());
+                System.out.println(toLogCommit.getMessage());
+                System.out.println();
+            }
+        }
     }
 
 

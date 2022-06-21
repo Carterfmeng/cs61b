@@ -282,6 +282,7 @@ public class Repository implements Serializable {
      * 1. java gitlet.Main checkout -- [file name]. */
     public static void checkoutFile(String checkoutFileName) {
 
+
     }
     /** 2. java gitlet.Main checkout [commit id] -- [file name]. */
     public static void checkoutFile(String commitID, String checkoutFileName) {

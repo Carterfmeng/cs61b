@@ -279,4 +279,19 @@ public class Repository implements Serializable {
         System.out.println("=== Untracked Files ===");
         System.out.println();
     }
+
+    /** need three different checkOut() method with different num of args
+     * 1. java gitlet.Main checkout -- [file name]. */
+    public static void checkoutFile(String checkoutFileName) {
+
+    }
+    /** 2. java gitlet.Main checkout [commit id] -- [file name]. */
+    public static void checkoutFile(String commitID, String checkoutFileName) {
+
+    }
+    /** 3. java gitlet.Main checkout [branch name]. */
+    public static void checkoutBranch(String branchName) {
+
+    }
+
 }

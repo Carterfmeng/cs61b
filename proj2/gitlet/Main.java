@@ -56,6 +56,26 @@ public class Main {
             case "status":
                 validateNumArgsIs("status", args, 1);
                 Repository.status();
+                break;
+            case "checkout":
+                validateMultiNumArgsAre("checkout", args, 2, 4);
+                if (args.length == 3) {
+                    String checkoutFileName = args[2];
+                    Repository.checkoutFile(checkoutFileName);
+                } else if (args.length == 4) {
+                    String commitID = args[1];
+                    String checkoutFileName = args[3];
+                    Repository.checkoutFile(commitID, checkoutFileName);
+                } else {
+                    String branchName = args[1];
+                    Repository.checkoutBranch(branchName);
+                }
+                break;
+            case "branch":
+                validateNumArgsIs("branch", args, 2);
+
+
+
         }
     }
 
@@ -68,6 +88,13 @@ public class Main {
 
     public static void validateNumArgsIs(String cmd, String[] args, int num) {
         if (args.length != num) {
+            System.out.println("Incorrect operands.");
+            System.exit(0);
+        }
+    }
+
+    public static void validateMultiNumArgsAre(String cmd, String[] args, int minNum, int maxNum) {
+        if (args.length < minNum || args.length > maxNum) {
             System.out.println("Incorrect operands.");
             System.exit(0);
         }

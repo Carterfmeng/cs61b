@@ -305,4 +305,9 @@ public class Repository implements Serializable {
         Commit HEADCommit = readHEADCommit();
         writeBranch(branchName, HEADCommit.getCommitID());
     }
+
+    /** remove the existing branch. */
+    public static void rmBranch(String branchName) {
+
+    }
 }

@@ -74,10 +74,13 @@ public class Main {
                 break;
             case "branch":
                 validateNumArgsIs("branch", args, 2);
-                String branchName = args[1];
-                Repository.branch(branchName);
-
-
+                String addBranchName = args[1];
+                Repository.branch(addBranchName);
+                break;
+            case "rm-branch":
+                validateNumArgsIs("rm-branch", args, 2);
+                String rmBranchName = args[1];
+                Repository.branch(rmBranchName);
         }
     }
 

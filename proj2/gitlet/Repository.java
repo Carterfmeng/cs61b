@@ -299,7 +299,7 @@ public class Repository implements Serializable {
         Set<String > existBranchesSet = new HashSet<>(existBranches);
         if (existBranchesSet.contains(branchName)) {
             System.out.println("A branch with that name already exists.");
-            System.exit(0);,
+            System.exit(0);
         }
         /** create a new branch file, and write the head commitID to this file.*/
         Commit HEADCommit = readHEADCommit();
@@ -308,6 +308,20 @@ public class Repository implements Serializable {
 
     /** remove the existing branch. */
     public static void rmBranch(String branchName) {
-
+        /** handle the failure cases. */
+        File HEADBranch = readHEADBranch();
+        File rmBranchFile = join(BRANCHES_DIR, branchName);
+        List<String> existBranches = plainFilenamesIn(BRANCHES_DIR);
+        Set<String > existBranchesSet = new HashSet<>(existBranches);
+        if (!existBranchesSet.contains(branchName)) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+        if (HEADBranch == rmBranchFile) {
+            System.out.println("Cannot remove the current branch.");
+            System.exit(0);
+        }
+        /** remove the branch.*/
+        restrictedDelete(rmBranchFile);
     }
 }

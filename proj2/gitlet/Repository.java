@@ -5,9 +5,7 @@ import edu.princeton.cs.algs4.StdIn;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import static gitlet.Utils.*;
 
@@ -294,4 +292,17 @@ public class Repository implements Serializable {
 
     }
 
+    /** create a new branch, but don't switch to it until be checkout. */
+    public static void branch(String branchName) throws IOException {
+        /** handle the failure cases. */
+        List<String> existBranches = plainFilenamesIn(BRANCHES_DIR);
+        Set<String > existBranchesSet = new HashSet<>(existBranches);
+        if (existBranchesSet.contains(branchName)) {
+            System.out.println("A branch with that name already exists.");
+            System.exit(0);,
+        }
+        /** create a new branch file, and write the head commitID to this file.*/
+        Commit HEADCommit = readHEADCommit();
+        writeBranch(branchName, HEADCommit.getCommitID());
+    }
 }

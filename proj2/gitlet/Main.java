@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.IOException;
+import java.util.ResourceBundle;
 
 /** Driver class for Gitlet, a subset of the Git version-control system.
  *  @author TODO
@@ -73,7 +74,8 @@ public class Main {
                 break;
             case "branch":
                 validateNumArgsIs("branch", args, 2);
-
+                String branchName = args[1];
+                Repository.branch(branchName);
 
 
         }

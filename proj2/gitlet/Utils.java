@@ -1,5 +1,7 @@
 package gitlet;
 
+import org.checkerframework.checker.units.qual.C;
+
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -329,6 +331,36 @@ class Utils {
         writeObject(toWriteCommitFile, toWriteCommit);
     }
 
+    /** need to deal with the abbreviation problem:
+     * in the (likely) event that no other object exists with a SHA-1
+     * identifier that starts with the same six digits. You should arrange
+     * for the same thing to happen for commit ids that contain fewer than
+     * 40 characters.*/
+    static Commit readCommitObjectMayAbb(String toReadCommitID) {
+        if (toReadCommitID == null) {
+            return null;
+        }
+        File COMMIT_DIR = join(Repository.COMMITS_DIR, toReadCommitID.substring(0, 2));
+        String toReadCommitFileNameAbb = toReadCommitID.substring(2);
+        List<String> fileNames = plainFilenamesIn(COMMIT_DIR);
+        File toReadCommitFile = null;
+        int findCommitNum = 0;
+        for (String fileName: fileNames) {
+            if (fileName.contains(toReadCommitFileNameAbb)) {
+                findCommitNum ++;
+                toReadCommitFile = join(COMMIT_DIR, fileName);
+            }
+        }
+        /** handle the failure case. */
+        if (findCommitNum == 0) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        } else if (findCommitNum >= 2) {
+            throw new GitletException("Multi commit with that abbreviate id.");
+        }
+        return readObject(toReadCommitFile, Commit.class);
+    }
+
     static Commit readCommitObject(String toReadCommitID) {
         if (toReadCommitID == null) {
             return null;
@@ -336,7 +368,7 @@ class Utils {
         File COMMIT_DIR = join(Repository.COMMITS_DIR, toReadCommitID.substring(0, 2));
         File toReadCommitFile = join(COMMIT_DIR, toReadCommitID.substring(2));
         if (!toReadCommitFile.exists()) {
-            throw new GitletException("The Commit doesn't exist");
+            throw new GitletException("No commit with that id exists.");
         }
         return readObject(toReadCommitFile, Commit.class);
     }
@@ -393,7 +425,7 @@ class Utils {
         writeContents(thisFile, contents);
     }
 
-    static String readFileContent(String fileName) {
+    static String readCWDFileContentByName(String fileName) {
         File thisFile = join(Repository.CWD, fileName);
         return readContentsAsString(thisFile);
     }
@@ -451,6 +483,10 @@ class Utils {
             throw new GitletException("The Blob doesn't exit");
         }
         return new File(readContentsAsString(toReadBlobFile));
+    }
+
+    static String readBlobContent(File toReadBlobFile) {
+        return readContentsAsString(toReadBlobFile);
     }
 
     static boolean isAddFileExists(String fileName) {

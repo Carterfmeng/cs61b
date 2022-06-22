@@ -80,7 +80,7 @@ public class Main {
             case "rm-branch":
                 validateNumArgsIs("rm-branch", args, 2);
                 String rmBranchName = args[1];
-                Repository.branch(rmBranchName);
+                Repository.rmBranch(rmBranchName);
                 break;
 
         }

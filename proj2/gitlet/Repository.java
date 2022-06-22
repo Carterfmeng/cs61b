@@ -1,6 +1,7 @@
 package gitlet;
 
 import edu.princeton.cs.algs4.StdIn;
+import org.eclipse.jetty.http.Http1FieldPreEncoder;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,7 +82,7 @@ public class Repository implements Serializable {
         StagingArea addArea = readStagingArea(STAGED_ADD);
         /** use the file name & content to create a blob first, then compute the
          *  sha1-hash id of this blob object in the working dir.*/
-        String addedBlobContent = readFileContent(fileName);
+        String addedBlobContent = readCWDFileContentByName(fileName);
         String addedBlobID = getBlobID(addedBlobContent);
 
         /** if the added file's corresponding blob doesn't exit, create the new blob file.*/
@@ -153,7 +154,7 @@ public class Repository implements Serializable {
         Commit HEADCommit = readHEADCommit();
         /** use the file name & content to create a blob first, then compute the
          *  sha1-hash id of this blob object in the working dir.*/
-        String rmFileContent = readFileContent(rmFileName);
+        String rmFileContent = readCWDFileContentByName(rmFileName);
         String rmBlobID = getBlobID(rmFileContent);
         /** handle the failure cases.*/
         if (!addArea.getStagedFiles().containsKey(rmFileName) && !HEADCommit.getBlobs().containsKey(rmFileName)) {
@@ -280,13 +281,40 @@ public class Repository implements Serializable {
 
     /** need three different checkOut() method with different num of args
      * 1. java gitlet.Main checkout -- [file name]. */
-    public static void checkoutFile(String checkoutFileName) {
-
-
+    public static void checkoutFile(String checkoutFileName) throws IOException {
+        /** read the checkoutBlob from the head Commit.*/
+        Commit HEADCommit = readHEADCommit();
+        String checkoutBlobID = HEADCommit.getBlobs().get(checkoutFileName);
+        /** failure case: if the checkoutBlobID == null, fail.*/
+        if (checkoutBlobID == null) {
+            System.out.println("File does not exist in that commit.");
+            System.exit(0);
+        }
+        File checkoutBlobFile = readBlobFile(checkoutBlobID);
+        String checkoutBlobContent = readBlobContent(checkoutBlobFile);
+        File workingDirFile = join(CWD, checkoutFileName);
+        if (!workingDirFile.exists()) {
+            workingDirFile.createNewFile();
+        }
+        writeContents(workingDirFile, checkoutBlobContent);
     }
     /** 2. java gitlet.Main checkout [commit id] -- [file name]. */
-    public static void checkoutFile(String commitID, String checkoutFileName) {
-
+    public static void checkoutFile(String commitID, String checkoutFileName) throws IOException {
+        /** Handle failure cases:
+         * when read checkoutCommit, handle the failure case when Commit doesn't exist.*/
+        Commit checkoutCommit = readCommitObjectMayAbb(commitID);
+        String checkoutBlobID = checkoutCommit.getBlobs().get(checkoutFileName);
+        if (checkoutBlobID == null) {
+            System.out.println("File does not exist in that commit.");
+            System.exit(0);
+        }
+        File checkoutBlobFile = readBlobFile(checkoutBlobID);
+        String checkoutBlobContent = readBlobContent(checkoutBlobFile);
+        File workingDirFile = join(CWD, checkoutFileName);
+        if (!workingDirFile.exists()) {
+            workingDirFile.createNewFile();
+        }
+        writeContents(workingDirFile, checkoutBlobContent);
     }
     /** 3. java gitlet.Main checkout [branch name]. */
     public static void checkoutBranch(String branchName) {

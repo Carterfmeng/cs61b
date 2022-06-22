@@ -404,4 +404,29 @@ public class Repository implements Serializable {
         /** remove the branch.*/
         restrictedDelete(rmBranchFile);
     }
+
+    public static void reset(String resetCommitID) throws IOException {
+        /** auto handle the failure cases: */
+        Commit toCheckoutCommit = readCommitObjectMayAbb(resetCommitID);
+        TreeMap<String, String> toCheckoutCommitBlobs = toCheckoutCommit.getBlobs();
+        /** read current branch. */
+        String currBranchName = getCurrBranchName();
+        Commit currCommit = readHEADCommit();
+        TreeMap<String, String> currCommitBlobs = currCommit.getBlobs();
+        /** read staging Area. */
+        StagingArea addArea = readStagingArea(STAGED_ADD);
+        StagingArea remArea = readStagingArea(STAGED_REM);
+        /** get untracked files in a set. */
+        Set<String> untrackedFileSet = getUntrackedFilesSet(currCommit);
+        if (IsACommitOverWriteUntrackedFile(untrackedFileSet, toCheckoutCommitBlobs)) {
+            printFailMsgAndExit("There is an untracked file in the way; delete it, or add and commit it first.");
+        }
+        /** checkout all the files in the corresponding branch. */
+        currCommitBlobs = checkoutFilesInABranch(currCommitBlobs, toCheckoutCommitBlobs);
+        writeBranch(currBranchName, resetCommitID);
+        rmFilesInWorkingDir(currCommitBlobs);
+        /** clear the Staged Area.*/
+        addArea.dump();
+        remArea.dump();
+    }
 }

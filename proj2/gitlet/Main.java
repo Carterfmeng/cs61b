@@ -81,7 +81,11 @@ public class Main {
                 String rmBranchName = args[1];
                 Repository.rmBranch(rmBranchName);
                 break;
-
+            case "reset":
+                validateNumArgsIs("reset", args, 2);
+                String resetCommitID = args[1];
+                Repository.reset(resetCommitID);
+                break;
         }
     }
 

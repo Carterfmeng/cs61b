@@ -422,7 +422,10 @@ class Utils {
 
     static String readCWDFileContentByName(String fileName) {
         File thisFile = join(Repository.CWD, fileName);
-        return readContentsAsString(thisFile);
+        if (thisFile.exists()) {
+            return readContentsAsString(thisFile);
+        }
+        return null;
     }
 
     static void writeStagingArea(File indexFile, StagingArea stagingArea) {
@@ -521,7 +524,10 @@ class Utils {
         if (!untrackedFileSet.isEmpty()) {
             for (String untrackedFile: untrackedFileSet) {
                 String untrackedFileContent = readCWDFileContentByName(untrackedFile);
-                String workingDirFileID = getBlobID(untrackedFileContent);
+                String workingDirFileID = null;
+                if (untrackedFileContent != null) {
+                    workingDirFileID = getBlobID(untrackedFileContent);
+                }
                 String toCheckoutBlobID = toCheckoutCommitBlobs.get(untrackedFile);
                 if (toCheckoutCommitBlobs.containsKey(untrackedFile) && workingDirFileID != toCheckoutBlobID) {
                     return true;

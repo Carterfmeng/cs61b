@@ -550,6 +550,16 @@ class Utils {
         return currCommitBlobs;
     }
 
+    static void rmFilesInWorkingDir(TreeMap<String, String> currCommitBlobs) {
+        for (Map.Entry<String, String> entry: currCommitBlobs.entrySet()) {
+            String rmFileName = entry.getKey();
+            File rmFile = join(Repository.CWD, rmFileName);
+            if (rmFile.exists()) {
+                rmFile.delete();
+            }
+        }
+    }
+
     static void printFailMsgAndExit(String msg) {
         System.out.println(msg);
         System.exit(0);

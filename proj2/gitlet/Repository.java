@@ -321,6 +321,7 @@ public class Repository implements Serializable {
         TreeMap<String, String> toCheckoutCommitBlobs = toCheckoutCommit.getBlobs();
         /** read staging Area. */
         StagingArea addArea = readStagingArea(STAGED_ADD);
+        StagingArea remArea = readStagingArea(STAGED_REM);
         /** handle the failure cases: */
         if (toCheckoutCommitID == null) {
             printFailMsgAndExit("No such branch exists.");
@@ -332,14 +333,13 @@ public class Repository implements Serializable {
         if (IsACommitOverWriteUntrackedFile(untrackedFileSet, toCheckoutCommitBlobs)) {
             printFailMsgAndExit("There is an untracked file in the way; delete it, or add and commit it first.");
         }
-
         /** checkout all the files in the corresponding branch. */
         currCommitBlobs = checkoutFilesInABranch(currCommitBlobs, toCheckoutCommitBlobs);
-
         writeHEAD(branchName);
-        /** TODO: Any files that are tracked in the current branch but are not present in the checked-out branch are deleted. -- use a helper method and reuse it in rm command*/
-
+        rmFilesInWorkingDir(currCommitBlobs);
+        /** clear the Staged Area.*/
         addArea.dump();
+        remArea.dump();
     }
 
     /** get the untracked files in the current commit:

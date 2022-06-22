@@ -1,7 +1,7 @@
 package gitlet;
 
 import java.io.IOException;
-import java.util.ResourceBundle;
+import static gitlet.Utils.*;
 
 /** Driver class for Gitlet, a subset of the Git version-control system.
  *  @author TODO
@@ -14,8 +14,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         // TODO: what if args is empty?
         if (validateNumArgsIs(args, 0)) {
-            System.out.println("Please enter a command.");
-            System.exit(0);
+            printFailMsgAndExit("Please enter a command.");
         }
         String firstArg = args[0];
         switch (firstArg) {
@@ -95,15 +94,13 @@ public class Main {
 
     public static void validateNumArgsIs(String cmd, String[] args, int num) {
         if (args.length != num) {
-            System.out.println("Incorrect operands.");
-            System.exit(0);
+            printFailMsgAndExit("Incorrect operands.");
         }
     }
 
     public static void validateMultiNumArgsAre(String cmd, String[] args, int minNum, int maxNum) {
         if (args.length < minNum || args.length > maxNum) {
-            System.out.println("Incorrect operands.");
-            System.exit(0);
+            printFailMsgAndExit("Incorrect operands.");
         }
     }
 }

@@ -49,8 +49,7 @@ public class Repository implements Serializable {
         Commit initialCommit = new Commit("initial commit", 0);
 
         if (GITLET_DIR.exists()) {
-            System.out.println("A Gitlet version-control system already exists in the current directory.");
-            System.exit(0);
+            printFailMsgAndExit("A Gitlet version-control system already exists in the current directory.");
         } else {
             /* Create the directory, and save the initial commit.*/
             GITLET_DIR.mkdir();
@@ -75,8 +74,7 @@ public class Repository implements Serializable {
     public static void add(String fileName) throws IOException {
         /** if add fileName don't exist, exit.*/
         if (!isAddFileExists(fileName)) {
-            System.out.println("File does not exist.");
-            System.exit(0);
+            printFailMsgAndExit("File does not exist.");
         }
 
         StagingArea addArea = readStagingArea(STAGED_ADD);
@@ -114,12 +112,10 @@ public class Repository implements Serializable {
         StagingArea addArea = readStagingArea(STAGED_ADD);
         StagingArea remArea = readStagingArea(STAGED_REM);
         if (addArea.getStagedFiles().size() == 0 && remArea.getStagedFiles().size() == 0 ) {
-            System.out.println("No changes added to the commit.");
-            System.exit(0);
+            printFailMsgAndExit("No changes added to the commit.");
         }
         if (message == "" || message == null ) {
-            System.out.println("Please enter a commit message.");
-            System.exit(0);
+            printFailMsgAndExit("Please enter a commit message.");
         }
 
         /** deep copy the commit from the HEAD commit.*/
@@ -158,8 +154,7 @@ public class Repository implements Serializable {
         String rmBlobID = getBlobID(rmFileContent);
         /** handle the failure cases.*/
         if (!addArea.getStagedFiles().containsKey(rmFileName) && !HEADCommit.getBlobs().containsKey(rmFileName)) {
-            System.out.println("No reason to remove the file.");
-            System.exit(0);
+            printFailMsgAndExit("No reason to remove the file.");
         }
 
         if (addArea.getStagedFiles().containsKey(rmFileName)) {
@@ -229,8 +224,7 @@ public class Repository implements Serializable {
         }
         /** handle the failure case.*/
         if (existCommitNum == 0) {
-            System.out.println("Found no commit with that message.");
-            System.exit(0);
+            printFailMsgAndExit("Found no commit with that message.");
         }
     }
 
@@ -287,8 +281,7 @@ public class Repository implements Serializable {
         String checkoutBlobID = HEADCommit.getBlobs().get(checkoutFileName);
         /** failure case: if the checkoutBlobID == null, fail.*/
         if (checkoutBlobID == null) {
-            System.out.println("File does not exist in that commit.");
-            System.exit(0);
+            printFailMsgAndExit("File does not exist in that commit.");
         }
         File checkoutBlobFile = readBlobFile(checkoutBlobID);
         String checkoutBlobContent = readBlobContent(checkoutBlobFile);
@@ -305,8 +298,7 @@ public class Repository implements Serializable {
         Commit checkoutCommit = readCommitObjectMayAbb(commitID);
         String checkoutBlobID = checkoutCommit.getBlobs().get(checkoutFileName);
         if (checkoutBlobID == null) {
-            System.out.println("File does not exist in that commit.");
-            System.exit(0);
+            printFailMsgAndExit("File does not exist in that commit.");
         }
         File checkoutBlobFile = readBlobFile(checkoutBlobID);
         String checkoutBlobContent = readBlobContent(checkoutBlobFile);
@@ -361,17 +353,14 @@ public class Repository implements Serializable {
         String currCommitID = readBranch(branchName);
         Commit currCommit = readCommitObject(currCommitID);
         if (currCommitID == null) {
-            System.out.println("No such branch exists.");
-            System.exit(0);
+            printFailMsgAndExit("No such branch exists.");
         }
         if (currentBranchName == branchName) {
-            System.out.println("No need to checkout the current branch.");
-            System.exit(0);
+            printFailMsgAndExit("No need to checkout the current branch.");
         }
         Set<String> untrackedFileSet = getUntrackedFilesSet(currCommit);
         if (untrackedFileSet != null) {
-            System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-            System.exit(0);
+            printFailMsgAndExit("There is an untracked file in the way; delete it, or add and commit it first.");
         }
 
         /** checkout all the files in the corresponding branch. */
@@ -400,8 +389,7 @@ public class Repository implements Serializable {
         List<String> existBranches = plainFilenamesIn(BRANCHES_DIR);
         Set<String > existBranchesSet = new HashSet<>(existBranches);
         if (existBranchesSet.contains(branchName)) {
-            System.out.println("A branch with that name already exists.");
-            System.exit(0);
+            printFailMsgAndExit("A branch with that name already exists.");
         }
         /** create a new branch file, and write the head commitID to this file.*/
         Commit HEADCommit = readHEADCommit();
@@ -416,12 +404,10 @@ public class Repository implements Serializable {
         List<String> existBranches = plainFilenamesIn(BRANCHES_DIR);
         Set<String > existBranchesSet = new HashSet<>(existBranches);
         if (!existBranchesSet.contains(branchName)) {
-            System.out.println("A branch with that name does not exist.");
-            System.exit(0);
+            printFailMsgAndExit("A branch with that name does not exist.");
         }
         if (HEADBranch == rmBranchFile) {
-            System.out.println("Cannot remove the current branch.");
-            System.exit(0);
+            printFailMsgAndExit("Cannot remove the current branch.");
         }
         /** remove the branch.*/
         restrictedDelete(rmBranchFile);

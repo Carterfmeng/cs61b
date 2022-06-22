@@ -353,8 +353,7 @@ class Utils {
         }
         /** handle the failure case. */
         if (findCommitNum == 0) {
-            System.out.println("No commit with that id exists.");
-            System.exit(0);
+            printFailMsgAndExit("No commit with that id exists.");
         } else if (findCommitNum >= 2) {
             throw new GitletException("Multi commit with that abbreviate id.");
         }
@@ -507,5 +506,10 @@ class Utils {
         File OBJECT_DIR = join(DIR, ID.substring(0, 2));
         File toReadOBJECTFile = join(OBJECT_DIR, ID.substring(2));
         return toReadOBJECTFile;
+    }
+
+    static void printFailMsgAndExit(String msg) {
+        System.out.println(msg);
+        System.exit(0);
     }
 }

@@ -309,15 +309,48 @@ public class Repository implements Serializable {
         writeContents(workingDirFile, checkoutBlobContent);
     }
 
-    /** how to compute:
+    /** 3. java gitlet.Main checkout [branch name]. */
+    public static void checkoutBranch(String branchName) throws IOException {
+        /** read current branch. */
+        String currBranchName = getCurrBranchName();
+        Commit currCommit = readHEADCommit();
+        TreeMap<String, String> currCommitBlobs = currCommit.getBlobs();
+        /** read checkout branch's commit. */
+        String toCheckoutCommitID = readBranch(branchName);
+        Commit toCheckoutCommit = readCommitObject(toCheckoutCommitID);
+        TreeMap<String, String> toCheckoutCommitBlobs = toCheckoutCommit.getBlobs();
+        /** read staging Area. */
+        StagingArea addArea = readStagingArea(STAGED_ADD);
+        /** handle the failure cases: */
+        if (toCheckoutCommitID == null) {
+            printFailMsgAndExit("No such branch exists.");
+        }
+        if (currBranchName == branchName) {
+            printFailMsgAndExit("No need to checkout the current branch.");
+        }
+        Set<String> untrackedFileSet = getUntrackedFilesSet(currCommit);
+        if (IsACommitOverWriteUntrackedFile(untrackedFileSet, toCheckoutCommitBlobs)) {
+            printFailMsgAndExit("There is an untracked file in the way; delete it, or add and commit it first.");
+        }
+
+        /** checkout all the files in the corresponding branch. */
+        currCommitBlobs = checkoutFilesInABranch(currCommitBlobs, toCheckoutCommitBlobs);
+
+        writeHEAD(branchName);
+        /** TODO: Any files that are tracked in the current branch but are not present in the checked-out branch are deleted. -- use a helper method and reuse it in rm command*/
+
+        addArea.dump();
+    }
+
+    /** get the untracked files in the current commit:
      * 1. get all the files' name in the working dir, convert to a Set;
      * 2. remove all the file names show in the STAGED_ADD area;
-     * 3. remove all the file names show in the Commit's Blobs;
+     * 3. remove all the file names show in the current commit's Blobs;
      * 4. add all the file names show in the STAGED_REM area;
      * if the Set not null, then got untracked files, which are the content of Set. */
-    private static Set<String> getUntrackedFilesSet(Commit toComparedCommit) {
+    private static Set<String> getUntrackedFilesSet(Commit currCommit) {
         List<String> filesInWorkingDir = plainFilenamesIn(CWD);
-        TreeMap<String, String> Blobs = toComparedCommit.getBlobs();
+        TreeMap<String, String> Blobs = currCommit.getBlobs();
         Set<String> untrackedFileSet = new HashSet<>();
         if (filesInWorkingDir != null) {
             untrackedFileSet = new HashSet<>(filesInWorkingDir);
@@ -339,48 +372,6 @@ public class Repository implements Serializable {
             untrackedFileSet.add(blobEntry.getKey());
         }
         return untrackedFileSet;
-    }
-
-    /** 3. java gitlet.Main checkout [branch name]. */
-    public static void checkoutBranch(String branchName) throws IOException {
-        /** handle the failure cases: */
-        File HEADBranchFile = readHEADBranch();
-        String HEADBranchPath = HEADBranchFile.toString();
-        int lastSlash = HEADBranchPath.lastIndexOf(java.io.File.separator);
-        String currentBranchName = HEADBranchPath.substring(lastSlash + 1);
-        /** DEBUG: to delete later.*/
-        System.out.println("DEBUG:" + currentBranchName);
-        String currCommitID = readBranch(branchName);
-        Commit currCommit = readCommitObject(currCommitID);
-        if (currCommitID == null) {
-            printFailMsgAndExit("No such branch exists.");
-        }
-        if (currentBranchName == branchName) {
-            printFailMsgAndExit("No need to checkout the current branch.");
-        }
-        Set<String> untrackedFileSet = getUntrackedFilesSet(currCommit);
-        if (untrackedFileSet != null) {
-            printFailMsgAndExit("There is an untracked file in the way; delete it, or add and commit it first.");
-        }
-
-        /** checkout all the files in the corresponding branch. */
-        StagingArea addArea = readStagingArea(STAGED_ADD);
-        TreeMap<String, String> currCommitBlobs = currCommit.getBlobs();
-        for (Map.Entry<String, String> entry: currCommitBlobs.entrySet()) {
-            String toCheckoutFileName = entry.getKey();
-            String toCheckoutBlobID = entry.getValue();
-            File toCheckoutBlobFile = readBlobFile(toCheckoutBlobID);
-            String toCheckoutBlobContent = readBlobContent(toCheckoutBlobFile);
-            File workingDirFile = join(CWD, toCheckoutFileName);
-            if (!workingDirFile.exists()) {
-                workingDirFile.createNewFile();
-            }
-            writeContents(workingDirFile, toCheckoutBlobContent);
-        }
-
-        writeHEAD(branchName);
-        /** TODO: Any files that are tracked in the current branch but are not present in the checked-out branch are deleted.*/
-        addArea.dump();
     }
 
     /** create a new branch, but don't switch to it until be checkout. */

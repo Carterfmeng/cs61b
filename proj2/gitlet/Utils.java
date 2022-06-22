@@ -16,9 +16,7 @@ import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Formatter;
-import java.util.List;
+import java.util.*;
 
 
 /** Assorted utilities.
@@ -488,6 +486,10 @@ class Utils {
         return readContentsAsString(toReadBlobFile);
     }
 
+    static String readBlobContent(String toReadBlobID) {
+        return readBlobContent(readBlobFile(toReadBlobID));
+    }
+
     static boolean isAddFileExists(String fileName) {
         File thisFile = join(Repository.CWD, fileName);
         if (thisFile.exists()) {
@@ -506,6 +508,46 @@ class Utils {
         File OBJECT_DIR = join(DIR, ID.substring(0, 2));
         File toReadOBJECTFile = join(OBJECT_DIR, ID.substring(2));
         return toReadOBJECTFile;
+    }
+
+    static String getCurrBranchName() {
+        File currBranchFile = readHEADBranch();
+        Commit currCommit = readCommitObject(readContentsAsString(currBranchFile));
+        String currBranchPath = currBranchFile.toString();
+        int lastSlash = currBranchPath.lastIndexOf(java.io.File.separator);
+        String currBranchName = currBranchPath.substring(lastSlash + 1);
+        /** DEBUG: to delete later.*/
+        System.out.println("DEBUG:" + currBranchName);
+        return currBranchName;
+    }
+
+    static boolean IsACommitOverWriteUntrackedFile(Set<String> untrackedFileSet, TreeMap<String, String> toCheckoutCommitBlobs) {
+        if (untrackedFileSet != null) {
+            for (String untrackedFile: untrackedFileSet) {
+                String workingDirFileID = getBlobID(readCWDFileContentByName(untrackedFile));
+                String toCheckoutBlobID = toCheckoutCommitBlobs.get(untrackedFile);
+                if (toCheckoutCommitBlobs.containsKey(untrackedFile) && workingDirFileID != toCheckoutBlobID) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    static TreeMap<String, String> checkoutFilesInABranch(TreeMap<String, String> currCommitBlobs , TreeMap<String, String> toCheckoutCommitBlobs) throws IOException {
+        for (Map.Entry<String, String> entry: toCheckoutCommitBlobs.entrySet()) {
+            String toCheckoutFileName = entry.getKey();
+            String toCheckoutBlobID = entry.getValue();
+            File toCheckoutBlobFile = readBlobFile(toCheckoutBlobID);
+            String toCheckoutBlobContent = readBlobContent(toCheckoutBlobFile);
+            File workingDirFile = join(Repository.CWD, toCheckoutFileName);
+            if (!workingDirFile.exists()) {
+                workingDirFile.createNewFile();
+            }
+            writeContents(workingDirFile, toCheckoutBlobContent);
+            currCommitBlobs.remove(toCheckoutFileName);
+        }
+        return currCommitBlobs;
     }
 
     static void printFailMsgAndExit(String msg) {

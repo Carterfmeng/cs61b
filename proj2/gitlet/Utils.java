@@ -477,7 +477,7 @@ class Utils {
         if (!toReadBlobFile.exists()) {
             throw new GitletException("The Blob doesn't exit");
         }
-        return new File(readContentsAsString(toReadBlobFile));
+        return toReadBlobFile;
     }
 
     static String readBlobContent(File toReadBlobFile) {
@@ -514,16 +514,12 @@ class Utils {
         String currBranchPath = currBranchFile.toString();
         int lastSlash = currBranchPath.lastIndexOf(java.io.File.separator);
         String currBranchName = currBranchPath.substring(lastSlash + 1);
-        /** DEBUG: to delete later.*/
-        System.out.println("DEBUG:" + currBranchName);
         return currBranchName;
     }
 
     static boolean IsACommitOverWriteUntrackedFile(Set<String> untrackedFileSet, TreeMap<String, String> toCheckoutCommitBlobs) {
         if (!untrackedFileSet.isEmpty()) {
-            System.out.println("DEBUG:" + untrackedFileSet);
             for (String untrackedFile: untrackedFileSet) {
-                System.out.println("DEBUG:" + untrackedFile);
                 String untrackedFileContent = readCWDFileContentByName(untrackedFile);
                 String workingDirFileID = getBlobID(untrackedFileContent);
                 String toCheckoutBlobID = toCheckoutCommitBlobs.get(untrackedFile);
@@ -539,8 +535,7 @@ class Utils {
         for (Map.Entry<String, String> entry: toCheckoutCommitBlobs.entrySet()) {
             String toCheckoutFileName = entry.getKey();
             String toCheckoutBlobID = entry.getValue();
-            File toCheckoutBlobFile = readBlobFile(toCheckoutBlobID);
-            String toCheckoutBlobContent = readBlobContent(toCheckoutBlobFile);
+            String toCheckoutBlobContent = readBlobContent(toCheckoutBlobID);
             File workingDirFile = join(Repository.CWD, toCheckoutFileName);
             if (!workingDirFile.exists()) {
                 workingDirFile.createNewFile();

@@ -316,9 +316,82 @@ public class Repository implements Serializable {
         }
         writeContents(workingDirFile, checkoutBlobContent);
     }
-    /** 3. java gitlet.Main checkout [branch name]. */
-    public static void checkoutBranch(String branchName) {
 
+    /** how to compute:
+     * 1. get all the files' name in the working dir, convert to a Set;
+     * 2. remove all the file names show in the STAGED_ADD area;
+     * 3. remove all the file names show in the Commit's Blobs;
+     * 4. add all the file names show in the STAGED_REM area;
+     * if the Set not null, then got untracked files, which are the content of Set. */
+    private static Set<String> getUntrackedFilesSet(Commit toComparedCommit) {
+        List<String> filesInWorkingDir = plainFilenamesIn(CWD);
+        TreeMap<String, String> Blobs = toComparedCommit.getBlobs();
+        Set<String> untrackedFileSet = new HashSet<>();
+        if (filesInWorkingDir != null) {
+            untrackedFileSet = new HashSet<>(filesInWorkingDir);
+        }
+        /** remove all the file names show in the STAGED_ADD area. */
+        StagingArea addArea = readStagingArea(STAGED_ADD);
+        TreeMap<String, String> stagedForAddFiles = addArea.getStagedFiles();
+        for (Map.Entry<String, String> blobEntry: stagedForAddFiles.entrySet()) {
+            untrackedFileSet.remove(blobEntry.getKey());
+        }
+        /** remove all the file names show in the Commit's Blobs. */
+        for (Map.Entry<String, String> blobEntry: Blobs.entrySet()) {
+            untrackedFileSet.remove(blobEntry.getKey());
+        }
+        /** add all the file names show in the STAGED_REM area. */
+        StagingArea remArea = readStagingArea(STAGED_REM);
+        TreeMap<String, String> stagedForRemFiles = remArea.getStagedFiles();
+        for (Map.Entry<String, String> blobEntry: stagedForRemFiles.entrySet()) {
+            untrackedFileSet.add(blobEntry.getKey());
+        }
+        return untrackedFileSet;
+    }
+
+    /** 3. java gitlet.Main checkout [branch name]. */
+    public static void checkoutBranch(String branchName) throws IOException {
+        /** handle the failure cases: */
+        File HEADBranchFile = readHEADBranch();
+        String HEADBranchPath = HEADBranchFile.toString();
+        int lastSlash = HEADBranchPath.lastIndexOf(java.io.File.separator);
+        String currentBranchName = HEADBranchPath.substring(lastSlash + 1);
+        /** DEBUG: to delete later.*/
+        System.out.println("DEBUG:" + currentBranchName);
+        String currCommitID = readBranch(branchName);
+        Commit currCommit = readCommitObject(currCommitID);
+        if (currCommitID == null) {
+            System.out.println("No such branch exists.");
+            System.exit(0);
+        }
+        if (currentBranchName == branchName) {
+            System.out.println("No need to checkout the current branch.");
+            System.exit(0);
+        }
+        Set<String> untrackedFileSet = getUntrackedFilesSet(currCommit);
+        if (untrackedFileSet != null) {
+            System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+            System.exit(0);
+        }
+
+        /** checkout all the files in the corresponding branch. */
+        StagingArea addArea = readStagingArea(STAGED_ADD);
+        TreeMap<String, String> currCommitBlobs = currCommit.getBlobs();
+        for (Map.Entry<String, String> entry: currCommitBlobs.entrySet()) {
+            String toCheckoutFileName = entry.getKey();
+            String toCheckoutBlobID = entry.getValue();
+            File toCheckoutBlobFile = readBlobFile(toCheckoutBlobID);
+            String toCheckoutBlobContent = readBlobContent(toCheckoutBlobFile);
+            File workingDirFile = join(CWD, toCheckoutFileName);
+            if (!workingDirFile.exists()) {
+                workingDirFile.createNewFile();
+            }
+            writeContents(workingDirFile, toCheckoutBlobContent);
+        }
+
+        writeHEAD(branchName);
+        /** TODO: Any files that are tracked in the current branch but are not present in the checked-out branch are deleted.*/
+        addArea.dump();
     }
 
     /** create a new branch, but don't switch to it until be checkout. */

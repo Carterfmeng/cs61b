@@ -381,7 +381,7 @@ class Utils {
         writeContents(branchFile, commitID);
     }
 
-    static String readBranch(String branchName, String commitID) {
+    static String readBranch(String branchName) {
         File branchFile = join(Repository.BRANCHES_DIR, branchName);
         if (branchFile.exists()) {
             return readContentsAsString(branchFile);

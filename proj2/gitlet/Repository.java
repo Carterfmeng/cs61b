@@ -1,8 +1,5 @@
 package gitlet;
 
-import edu.princeton.cs.algs4.StdIn;
-import org.eclipse.jetty.http.Http1FieldPreEncoder;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -42,6 +39,7 @@ public class Repository implements Serializable {
     /** The Staging area file. */
     public static final File STAGED_ADD = join(GITLET_DIR, "addIndex");
     public static final File STAGED_REM = join(GITLET_DIR, "remIndex");
+    public static final String[] PRESERVE_FILES = new String[]{"Makefile", "gitlet-design.md", "pom.xml"};
 
     /* TODO: fill in the rest of this class. */
 
@@ -354,6 +352,9 @@ public class Repository implements Serializable {
         Set<String> untrackedFileSet = new HashSet<>();
         if (filesInWorkingDir != null) {
             untrackedFileSet = new HashSet<>(filesInWorkingDir);
+            for (String preserveFile: PRESERVE_FILES) {
+                untrackedFileSet.remove(preserveFile);
+            }
         }
         /** remove all the file names show in the STAGED_ADD area. */
         StagingArea addArea = readStagingArea(STAGED_ADD);

@@ -1,7 +1,5 @@
 package gitlet;
 
-import org.checkerframework.checker.units.qual.C;
-
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -522,9 +520,12 @@ class Utils {
     }
 
     static boolean IsACommitOverWriteUntrackedFile(Set<String> untrackedFileSet, TreeMap<String, String> toCheckoutCommitBlobs) {
-        if (untrackedFileSet != null) {
+        if (!untrackedFileSet.isEmpty()) {
+            System.out.println("DEBUG:" + untrackedFileSet);
             for (String untrackedFile: untrackedFileSet) {
-                String workingDirFileID = getBlobID(readCWDFileContentByName(untrackedFile));
+                System.out.println("DEBUG:" + untrackedFile);
+                String untrackedFileContent = readCWDFileContentByName(untrackedFile);
+                String workingDirFileID = getBlobID(untrackedFileContent);
                 String toCheckoutBlobID = toCheckoutCommitBlobs.get(untrackedFile);
                 if (toCheckoutCommitBlobs.containsKey(untrackedFile) && workingDirFileID != toCheckoutBlobID) {
                     return true;

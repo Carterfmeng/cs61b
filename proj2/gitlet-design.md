@@ -116,11 +116,53 @@ reset
 
 ![image-20220616095503633](https://s2.loli.net/2022/06/16/ZFA4dMbu5X9KLyR.png)
 
-merge
+merge demands:
 
- 
+current branch, given branch:
+
+Firstly,  one branch is at the split point:
+
+1. If the split point *is* the same commit as the given branch, then we do nothing. Operation ends with the message `Given branch is an ancestor of the current branch.`
+2.  If the split point is the current branch, check out the given branch, printing the message `Current branch fast-forwarded.`
+
+Secondly, both branches aren't at the split point, Then any files ...
+
+1. have been *modified* in the given branch since the split point, but not modified in the current branch since the split point should be changed to their versions in the given branch (checked out from the commit at the front of the given branch). These files should then all be automatically staged. 
+
+   
+
+2.  have been modified in the current branch but not in the given branch, do nothing;
+
+3. have been modified in both the current and given branch in the same way (have the same content or were both removed), left unchanged by the merge.
+
+   PS: if a file was removed from both the current and given branch, but a file of the same name is present in the working directory, it is left alone and continues to be absent (not tracked nor staged) in the merge.
+
+   
+
+4.  not present at the split point, and present only in the current branch, remain as they are.
+
+5. not present at the split point and are present only in the given branch should be checked out and staged.
+
+   Take current branch as granted:
+
+6.  present at the split point, unmodified in the current branch, and absent in the given branch should be removed (and untracked)
+
+7.  present at the split point, unmodified in the given branch, and absent in the current branch should remain absent
+
+   
+
+8.  modified in different ways in the current and given branches are *in conflict*：
+
+   1） contents of both are changed and different from other
+
+   2）the contents of one are changed and the other file is deleted
+
+   3）the file was absent at the split point and has different contents in the given and current branches
+
+   In this case, replace the contents of the conflicted file with and stage the result.
 
 
+![image-20220623110514702](E:\course_projects\cs61b\proj2\image-20220623110514702.png)
 
 
 ### Class Commit

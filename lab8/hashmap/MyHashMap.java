@@ -29,7 +29,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         LinkedList<K> nodeKeys;
         int wizPos;
 
-        MyHashMapIterator(MyHashMap<K, V> thisHashMap) {
+        MyHashMapIterator() {
             nodeKeys = new LinkedList<>();
             for (K tempKey: keySet()) {
                 nodeKeys.add(tempKey);
@@ -224,6 +224,6 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     @Override
     public Iterator<K> iterator() {
-        return new MyHashMapIterator(this);
+        return new MyHashMapIterator();
     }
 }

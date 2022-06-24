@@ -25,22 +25,28 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         }
     }
 
-    private class MyHashMapIterator implements Iterator<Node> {
-        LinkedList<Node> nodes;
+    private class MyHashMapIterator implements Iterator<K> {
+        LinkedList<K> nodeKeys;
         int wizPos;
 
-        MyHashMapIterator() {
-
+        MyHashMapIterator(MyHashMap<K, V> thisHashMap) {
+            nodeKeys = new LinkedList<>();
+            for (K tempKey: keySet()) {
+                nodeKeys.add(tempKey);
+            }
+            wizPos = 0;
         }
 
         @Override
         public boolean hasNext() {
-            return false;
+            return wizPos < size();
         }
 
         @Override
-        public Node next() {
-            return null;
+        public K next() {
+            K returnKey = nodeKeys.remove();
+            wizPos++;
+            return returnKey;
         }
     }
 
@@ -197,7 +203,13 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     @Override
     public Set<K> keySet() {
-        return null;
+        Set<K> tempSet = new HashSet<>();
+        for (int i = 0; i < buckets.length; i++) {
+            for (Node oldNode: buckets[i]) {
+                tempSet.add(oldNode.key);
+            }
+        }
+        return tempSet;
     }
 
     @Override
@@ -212,6 +224,6 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     @Override
     public Iterator<K> iterator() {
-        return null;
+        return new MyHashMapIterator(this);
     }
 }

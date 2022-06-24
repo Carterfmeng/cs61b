@@ -61,12 +61,18 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     public MyHashMap() {
         this.size = 0;
         this.buckets = createTable(16);
+        for (int i = 0; i < buckets.length; i++) {
+            buckets[i] = createBucket();
+        }
         this.loadFactor = 0.75;
     }
 
     public MyHashMap(int initialSize) {
         this.size = 0;
         this.buckets = createTable(initialSize);
+        for (int i = 0; i < buckets.length; i++) {
+            buckets[i] = createBucket();
+        }
         this.loadFactor = 0.75;
     }
 
@@ -80,6 +86,9 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     public MyHashMap(int initialSize, double maxLoad) {
         this.size = 0;
         this.buckets = createTable(initialSize);
+        for (int i = 0; i < buckets.length; i++) {
+            buckets[i] = createBucket();
+        }
         this.loadFactor = maxLoad;
     }
 
@@ -109,7 +118,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * OWN BUCKET DATA STRUCTURES WITH THE NEW OPERATOR!
      */
     protected Collection<Node> createBucket() {
-        return null;
+        return new ArrayList<>();
     }
 
     /**
@@ -137,6 +146,9 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     public boolean containsKey(K key) {
         int keyHashCode = key.hashCode();
         int index = Math.floorMod(keyHashCode, buckets.length);
+        if (buckets[index] == null) {
+            return false;
+        }
         for (Node tempNode: buckets[index]) {
             if (tempNode.key.equals(key)) {
                 return true;
@@ -183,10 +195,12 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
              * remember size ++ and resize the buckets if it's necessary*/
             Node addNode = createNode(key, value);
             size++;
-            if ((double)size / buckets.length < loadFactor) {
+            if ((double)size / buckets.length <= loadFactor) {
                 buckets[index].add(addNode);
             } else {
                 resizeBuckets(2 * buckets.length);
+                index = Math.floorMod(keyHashCode, buckets.length);
+                buckets[index].add(addNode);
             }
         }
     }

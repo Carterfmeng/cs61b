@@ -118,9 +118,23 @@ reset
 
 merge demands:
 
+
+
+
+
 current branch, given branch:
 
-Firstly,  one branch is at the split point:
+Firstly,  one branch is at the split point: (Step1: find the split point commit)
+
+algorithm:
+
+1)use BFS to find the shortest path to each ancestor commit from each branch; O(N) times to iterate over all the ancestor commit  (2N)
+
+2)find all the ancestor commit distance for one branch ,then use tree map to save the distance from ancestor commit to the branch commit, and use contains method to determine if this commit is the common ancestor; O(logN ) to determine if the common ancestor commit Sets contains this commit;
+
+3)pick the latest commit in the common ancestor commit Sets;
+
+
 
 1. If the split point *is* the same commit as the given branch, then we do nothing. Operation ends with the message `Given branch is an ancestor of the current branch.`
 2.  If the split point is the current branch, check out the given branch, printing the message `Current branch fast-forwarded.`

@@ -406,6 +406,16 @@ class Utils {
         return readObject(headCommitFile, Commit.class);
     }
 
+    static String readHEADCommitID() {
+        File HEADFile = join(Repository.GITLET_DIR, "HEAD");
+        if (!HEADFile.exists()) {
+            throw new GitletException("The HEAD file doesn't exist");
+        }
+        File branchFile = new File(readContentsAsString(HEADFile));
+        String headCommitID = readContentsAsString(branchFile);
+        return headCommitID;
+    }
+
     static File readHEADBranch() {
         File HEADFile = join(Repository.GITLET_DIR, "HEAD");
         if (!HEADFile.exists()) {
@@ -445,6 +455,9 @@ class Utils {
     }
 
     static String getBlobID(String blobContent) {
+        if (blobContent == null) {
+            return null;
+        }
         return sha1(blobContent);
     }
 
@@ -520,6 +533,43 @@ class Utils {
         return currBranchName;
     }
 
+    /** get the untracked files in the current commit:
+     * 1. get all the files' name in the working dir, convert to a Set;
+     * 2. remove all the file names show in the STAGED_ADD area;
+     * 3. remove all the file names show in the current commit's Blobs;
+     * 4. add all the file names show in the STAGED_REM area;
+     * if the Set not null, then got untracked files, which are the content of Set. */
+    static Set<String> getUntrackedFilesSet(Commit currCommit) {
+        List<String> filesInWorkingDir = plainFilenamesIn(Repository.CWD);
+        TreeMap<String, String> Blobs = currCommit.getBlobs();
+        Set<String> untrackedFileSet = new HashSet<>();
+        if (filesInWorkingDir != null) {
+            untrackedFileSet = new HashSet<>(filesInWorkingDir);
+            for (String preserveFile: Repository.PRESERVE_FILES) {
+                untrackedFileSet.remove(preserveFile);
+            }
+        }
+        /** remove all the file names show in the STAGED_ADD area. */
+        StagingArea addArea = readStagingArea(Repository.STAGED_ADD);
+        TreeMap<String, String> stagedForAddFiles = addArea.getStagedFiles();
+        for (Map.Entry<String, String> blobEntry: stagedForAddFiles.entrySet()) {
+            untrackedFileSet.remove(blobEntry.getKey());
+        }
+        /** remove all the file names show in the Commit's Blobs. */
+        for (Map.Entry<String, String> blobEntry: Blobs.entrySet()) {
+            untrackedFileSet.remove(blobEntry.getKey());
+        }
+        /** add all the file names show in the STAGED_REM area. */
+        StagingArea remArea = readStagingArea(Repository.STAGED_REM);
+        TreeMap<String, String> stagedForRemFiles = remArea.getStagedFiles();
+        for (Map.Entry<String, String> blobEntry: stagedForRemFiles.entrySet()) {
+            untrackedFileSet.add(blobEntry.getKey());
+        }
+        return untrackedFileSet;
+    }
+
+    /** If an untracked file in the current commit would be overwritten
+     * or deleted by the merge/checkout, return ture, else return false */
     static boolean IsACommitOverWriteUntrackedFile(Set<String> untrackedFileSet, TreeMap<String, String> toCheckoutCommitBlobs) {
         if (!untrackedFileSet.isEmpty()) {
             for (String untrackedFile: untrackedFileSet) {

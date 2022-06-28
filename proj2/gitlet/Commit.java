@@ -68,16 +68,20 @@ public class Commit implements Serializable {
         return this.blobs;
     }
 
-    public Commit getParent() {
-        return readCommitObject(this.parentID);
-    }
-
     public String getParentID() { return this.parentID;}
 
     public String getSecondParentID() { return this.secondParentID; }
 
+    public Commit getParent() {
+        return readCommitObject(this.parentID);
+    }
+
+    public Commit getSecondParent() {
+        return readCommitObject(this.secondParentID);
+    }
+
     public String getCommitID() {
-        return sha1(serialize(this));
+        return sha1((Object) serialize(this));
     }
 
 

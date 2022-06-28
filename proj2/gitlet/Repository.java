@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.*;
 
 import static gitlet.Utils.*;
+import static gitlet.Utils.printFailMsgAndExit;
 
 // TODO: any imports you need here
 
@@ -340,41 +341,6 @@ public class Repository implements Serializable {
         remArea.dump();
     }
 
-    /** get the untracked files in the current commit:
-     * 1. get all the files' name in the working dir, convert to a Set;
-     * 2. remove all the file names show in the STAGED_ADD area;
-     * 3. remove all the file names show in the current commit's Blobs;
-     * 4. add all the file names show in the STAGED_REM area;
-     * if the Set not null, then got untracked files, which are the content of Set. */
-    private static Set<String> getUntrackedFilesSet(Commit currCommit) {
-        List<String> filesInWorkingDir = plainFilenamesIn(CWD);
-        TreeMap<String, String> Blobs = currCommit.getBlobs();
-        Set<String> untrackedFileSet = new HashSet<>();
-        if (filesInWorkingDir != null) {
-            untrackedFileSet = new HashSet<>(filesInWorkingDir);
-            for (String preserveFile: PRESERVE_FILES) {
-                untrackedFileSet.remove(preserveFile);
-            }
-        }
-        /** remove all the file names show in the STAGED_ADD area. */
-        StagingArea addArea = readStagingArea(STAGED_ADD);
-        TreeMap<String, String> stagedForAddFiles = addArea.getStagedFiles();
-        for (Map.Entry<String, String> blobEntry: stagedForAddFiles.entrySet()) {
-            untrackedFileSet.remove(blobEntry.getKey());
-        }
-        /** remove all the file names show in the Commit's Blobs. */
-        for (Map.Entry<String, String> blobEntry: Blobs.entrySet()) {
-            untrackedFileSet.remove(blobEntry.getKey());
-        }
-        /** add all the file names show in the STAGED_REM area. */
-        StagingArea remArea = readStagingArea(STAGED_REM);
-        TreeMap<String, String> stagedForRemFiles = remArea.getStagedFiles();
-        for (Map.Entry<String, String> blobEntry: stagedForRemFiles.entrySet()) {
-            untrackedFileSet.add(blobEntry.getKey());
-        }
-        return untrackedFileSet;
-    }
-
     /** create a new branch, but don't switch to it until be checkout. */
     public static void branch(String branchName) throws IOException {
         /** handle the failure cases. */
@@ -428,5 +394,40 @@ public class Repository implements Serializable {
         /** clear the Staged Area.*/
         addArea.dump();
         remArea.dump();
+    }
+
+    public static void merge(String givenBranchName) {
+        /** read the staging area.*/
+        StagingArea addArea = readStagingArea(STAGED_ADD);
+        StagingArea remArea = readStagingArea(STAGED_REM);
+        /** read given branch's commit. */
+        String givenBranchCommitID = readBranch(givenBranchName);
+        Commit givenBranchCommit = readCommitObject(givenBranchCommitID);
+        TreeMap<String, String> givenBranchCommitBlobs = givenBranchCommit.getBlobs();
+        String currBranchName = getCurrBranchName();
+        String currBranchCommitID = readHEADCommitID();
+        Commit currBranchCommit = readHEADCommit();
+        /** handle failure cases: */
+        if (!addArea.getStagedFiles().isEmpty() || !remArea.getStagedFiles().isEmpty()) {
+            printFailMsgAndExit("You have uncommitted changes.");
+        }
+        if (givenBranchCommitID == null) {
+            printFailMsgAndExit("A branch with that name does not exist.");
+        }
+        if (givenBranchName == currBranchName) {
+            printFailMsgAndExit("Cannot merge a branch with itself.");
+        }
+        Set<String> untrackedFileSet = getUntrackedFilesSet(currBranchCommit);
+        if (IsACommitOverWriteUntrackedFile(untrackedFileSet, givenBranchCommitBlobs)) {
+            printFailMsgAndExit("There is an untracked file in the way; delete it, or add and commit it first.");
+        }
+
+        /** find the split point. The Commit Graph is already exists, use it to
+         * search for the split point*/
+        BreadFirstPaths currBranchPaths = new BreadFirstPaths(currBranchCommitID);
+        BreadFirstPaths givenBranchPaths = new BreadFirstPaths(givenBranchCommitID);
+        String splitPointID = BreadFirstPaths.getSplitPointID(currBranchPaths, givenBranchPaths);
+        Commit splitPointCommit = readCommitObject(splitPointID);
+
     }
 }

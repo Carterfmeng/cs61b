@@ -86,6 +86,10 @@ public class Main {
                 String resetCommitID = args[1];
                 Repository.reset(resetCommitID);
                 break;
+            case "merge":
+                validateNumArgsIs("merge", args, 2);;
+                String givenBranchName = args[1];
+                Repository.merge(givenBranchName);
         }
     }
 

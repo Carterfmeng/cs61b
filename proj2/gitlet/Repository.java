@@ -396,7 +396,7 @@ public class Repository implements Serializable {
         remArea.dump();
     }
 
-    public static void merge(String givenBranchName) {
+    public static void merge(String givenBranchName) throws IOException {
         /** read the staging area.*/
         StagingArea addArea = readStagingArea(STAGED_ADD);
         StagingArea remArea = readStagingArea(STAGED_REM);
@@ -426,8 +426,22 @@ public class Repository implements Serializable {
          * search for the split point*/
         BreadFirstPaths currBranchPaths = new BreadFirstPaths(currBranchCommitID);
         BreadFirstPaths givenBranchPaths = new BreadFirstPaths(givenBranchCommitID);
-        String splitPointID = BreadFirstPaths.getSplitPointID(currBranchPaths, givenBranchPaths);
-        Commit splitPointCommit = readCommitObject(splitPointID);
+        String splitPointCommitID = BreadFirstPaths.getSplitPointID(currBranchPaths, givenBranchPaths);
+        Commit splitPointCommit = readCommitObject(splitPointCommitID);
+
+        /** If the split point is the same commit as the given branch, do nothing. */
+        if (splitPointCommitID == givenBranchCommitID) {
+            printFailMsgAndExit("Given branch is an ancestor of the current branch.");
+        }
+        /** If the split point is the current branch, check out the given branch. */
+        if (splitPointCommitID == currBranchCommitID) {
+            checkoutBranch(givenBranchName);
+            printFailMsgAndExit("Current branch fast-forwarded.");
+        }
+
+        /** both branches aren't at the split point. */
+
+
 
     }
 }

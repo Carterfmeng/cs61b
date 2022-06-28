@@ -438,6 +438,15 @@ class Utils {
         return null;
     }
 
+    static String readCommitFileContentByName(String fileName, TreeMap<String, String> blobs) {
+        if (!blobs.containsKey(fileName)) {
+            return null;
+        }
+        String blobID = blobs.get(fileName);
+        String blobContent = readBlobContent(blobID);
+        return blobContent;
+    }
+
     static void writeStagingArea(File indexFile, StagingArea stagingArea) {
         writeObject(indexFile, stagingArea);
     }
@@ -488,6 +497,9 @@ class Utils {
     }
 
     static File readBlobFile(String toReadBlobID) {
+        if (toReadBlobID == null) {
+            return null;
+        }
         File BLOB_DIR = join(Repository.BLOBS_DIR, toReadBlobID.substring(0, 2));
         File toReadBlobFile = join(BLOB_DIR, toReadBlobID.substring(2));
         if (!toReadBlobFile.exists()) {
@@ -497,6 +509,9 @@ class Utils {
     }
 
     static String readBlobContent(File toReadBlobFile) {
+        if (toReadBlobFile == null) {
+            return null;
+        }
         return readContentsAsString(toReadBlobFile);
     }
 

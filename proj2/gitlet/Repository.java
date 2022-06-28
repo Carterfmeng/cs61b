@@ -439,9 +439,28 @@ public class Repository implements Serializable {
             printFailMsgAndExit("Current branch fast-forwarded.");
         }
 
-        /** both branches aren't at the split point. */
+        /** both branches aren't at the split point. HEAD: currBranch, Other: givenBranch*/
+        TreeMap<String, String> splitPointCommitBlobs = splitPointCommit.getBlobs();
+        TreeMap<String, String> currBranchCommitBlobs = currBranchCommit.getBlobs();
+        //TODO: iterate over all the files show in split point.
+        for (Map.Entry<String, String> entry: splitPointCommitBlobs.entrySet()) {
+            String splitPointCommitBlobName = entry.getKey();
+            String splitPointCommitBlobID = entry.getValue();
+            String currBranchCommitBlobID = currBranchCommitBlobs.get(splitPointCommitBlobName);
+            String givenBranchCommitBlobID = givenBranchCommitBlobs.get(splitPointCommitBlobName);
+            /** 1. modified in other but not HEAD --> other. */
+            if (givenBranchCommitBlobID != null && !splitPointCommitBlobID.equals(givenBranchCommitBlobID) && splitPointCommitBlobID.equals(currBranchCommitBlobID)) {
+                checkoutFile(givenBranchCommitBlobID, splitPointCommitBlobName);
+
+            }
+        }
 
 
+
+
+
+
+        //TODO: iterate over all the files not show in the split point.
 
     }
 }

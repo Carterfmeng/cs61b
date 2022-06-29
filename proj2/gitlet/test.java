@@ -1,4 +1,7 @@
 package gitlet;
+import java.io.File;
+
+import static gitlet.Utils.*;
 
 public class test {
     static void message(String msg, Object... args) {
@@ -7,7 +10,5 @@ public class test {
     }
 
     public static void main(String[] args) {
-        boolean adult = true;
-        message("%b%n", adult);
     }
 }

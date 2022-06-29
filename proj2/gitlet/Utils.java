@@ -421,8 +421,7 @@ class Utils {
         if (!HEADFile.exists()) {
             throw new GitletException("The HEAD file doesn't exist");
         }
-        File branchFile = new File(readContentsAsString(HEADFile));
-        return branchFile;
+        return new File(readContentsAsString(HEADFile));
     }
 
     static void writeFileContent(String fileName, Object... contents) {
@@ -630,5 +629,19 @@ class Utils {
     static void printFailMsgAndExit(String msg) {
         System.out.println(msg);
         System.exit(0);
+    }
+
+    static boolean checkThreeEquals(String a, String b, String c) {
+        return !a.equals(b) && !b.equals(c) && !a.equals(c);
+    }
+
+    static String joinConflictFileContent(String currBranchCommitBlobID, String givenBranchCommitBlobID) {
+        String header = "<<<<<<< HEAD\n";
+        String splitLine = "=======\n";
+        String BottomLine = ">>>>>>>";
+        String currBranchContent = readBlobContent(currBranchCommitBlobID);
+        String givenBranchContent = readBlobContent(givenBranchCommitBlobID);
+        return header + currBranchContent + splitLine + givenBranchContent + BottomLine;
+
     }
 }

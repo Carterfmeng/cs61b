@@ -25,19 +25,33 @@ public class Repository implements Serializable {
      * variable is used. We've provided two examples for you.
      */
 
-    /** The current working directory. */
+    /**
+     * The current working directory.
+     */
     public static final File CWD = new File(System.getProperty("user.dir"));
-    /** The .gitlet directory. */
+    /**
+     * The .gitlet directory.
+     */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
-    /** the objects directory, which save the commits and files/blobs in two respective dir. */
+    /**
+     * the objects directory, which save the commits and files/blobs in two respective dir.
+     */
     public static final File OBJECTS_DIR = join(GITLET_DIR, "objects");
-    /** the commits dir .*/
+    /**
+     * the commits dir .
+     */
     public static final File COMMITS_DIR = join(OBJECTS_DIR, "commits");
-    /** the blobs dir .*/
-    public static final  File BLOBS_DIR = join(OBJECTS_DIR, "blobs");
-    /** the branch directory, where save the different branches' name and lastest commitID.*/
-    public static final File BRANCHES_DIR = join(GITLET_DIR,"heads");
-    /** The Staging area file. */
+    /**
+     * the blobs dir .
+     */
+    public static final File BLOBS_DIR = join(OBJECTS_DIR, "blobs");
+    /**
+     * the branch directory, where save the different branches' name and lastest commitID.
+     */
+    public static final File BRANCHES_DIR = join(GITLET_DIR, "heads");
+    /**
+     * The Staging area file.
+     */
     public static final File STAGED_ADD = join(GITLET_DIR, "addIndex");
     public static final File STAGED_REM = join(GITLET_DIR, "remIndex");
     public static final String[] PRESERVE_FILES = new String[]{"Makefile", "gitlet-design.md", "pom.xml"};
@@ -107,26 +121,30 @@ public class Repository implements Serializable {
     }
 
     public static void commit(String message) throws IOException {
+        commitMayMerge(message, null);
+    }
+
+    public static void commitMayMerge(String message, String secondParentID) throws IOException {
         /** handle the failure cases.*/
         StagingArea addArea = readStagingArea(STAGED_ADD);
         StagingArea remArea = readStagingArea(STAGED_REM);
-        if (addArea.getStagedFiles().size() == 0 && remArea.getStagedFiles().size() == 0 ) {
+        if (addArea.getStagedFiles().size() == 0 && remArea.getStagedFiles().size() == 0) {
             printFailMsgAndExit("No changes added to the commit.");
         }
-        if (message == "" || message == null ) {
+        if (message == null || message.equals("") ) {
             printFailMsgAndExit("Please enter a commit message.");
         }
 
         /** deep copy the commit from the HEAD commit.*/
         Commit headCommit = readHEADCommit();
-        Commit freshCommit = new Commit(headCommit, message);
+        Commit freshCommit = new Commit(headCommit, secondParentID, message);
         TreeMap<String, String> addStagedFiles = addArea.getStagedFiles();
         TreeMap<String, String> remStagedFiles = remArea.getStagedFiles();
-        for (Map.Entry<String, String> entry: addStagedFiles.entrySet()) {
+        for (Map.Entry<String, String> entry : addStagedFiles.entrySet()) {
             /** change the blob's sha1-ID in the addStagedArea.*/
             freshCommit.getBlobs().put(entry.getKey(), entry.getValue());
         }
-        for (Map.Entry<String, String> entry: remStagedFiles.entrySet()) {
+        for (Map.Entry<String, String> entry : remStagedFiles.entrySet()) {
             /** remove the entry in the remStagedArea.*/
             freshCommit.getBlobs().remove(entry.getKey());
         }
@@ -159,16 +177,18 @@ public class Repository implements Serializable {
         if (addArea.getStagedFiles().containsKey(rmFileName)) {
             File deleteBlob = readBlobFile(rmBlobID);
             addArea.getStagedFiles().remove(rmFileName);
-            restrictedDelete(deleteBlob);
+            deleteBlob.delete();
             writeStagingArea(STAGED_ADD, addArea);
         } else if (HEADCommit.getBlobs().containsKey(rmFileName)) {
             remArea.getStagedFiles().put(rmFileName, rmBlobID);
             writeStagingArea(STAGED_REM, remArea);
-            rmFile.delete();
+            restrictedDelete(rmFile);
         }
     }
 
-    /** the helper method to print a commit's log.*/
+    /**
+     * the helper method to print a commit's log.
+     */
     private static void printCommitLog(Commit toPrintCommit) {
         System.out.println("===");
         System.out.println("commit " + toPrintCommit.getCommitID());
@@ -197,9 +217,9 @@ public class Repository implements Serializable {
 
     public static void globalLog() {
         List<String> allCommitsDirs = DIRsIn(COMMITS_DIR);
-        for (String dir: allCommitsDirs) {
+        for (String dir : allCommitsDirs) {
             List<String> allCommitsInDir = plainFilenamesIn(join(COMMITS_DIR, dir));
-            for (String commit: allCommitsInDir) {
+            for (String commit : allCommitsInDir) {
                 File toLogCommitFile = join(COMMITS_DIR, dir, commit);
                 Commit toLogCommit = readObject(toLogCommitFile, Commit.class);
                 printCommitLog(toLogCommit);
@@ -210,9 +230,9 @@ public class Repository implements Serializable {
     public static void find(String findMessage) {
         List<String> allCommitsDirs = DIRsIn(COMMITS_DIR);
         int existCommitNum = 0;
-        for (String dir: allCommitsDirs) {
+        for (String dir : allCommitsDirs) {
             List<String> allCommitsInDir = plainFilenamesIn(join(COMMITS_DIR, dir));
-            for (String commit: allCommitsInDir) {
+            for (String commit : allCommitsInDir) {
                 File toLogCommitFile = join(COMMITS_DIR, dir, commit);
                 Commit toLogCommit = readObject(toLogCommitFile, Commit.class);
                 if (toLogCommit.getMessage().contains(findMessage)) {
@@ -241,7 +261,7 @@ public class Repository implements Serializable {
 
         /** print Branches. */
         System.out.println("=== Branches ===");
-        for (String branchName: branchNames) {
+        for (String branchName : branchNames) {
             /** if the branch is the head branch, print an asterisk. */
             if (HEADBranchPath.contains(branchName)) {
                 System.out.print("*");
@@ -252,14 +272,14 @@ public class Repository implements Serializable {
         /** print Staged Files. */
         TreeMap<String, String> addStagedFiles = addArea.getStagedFiles();
         System.out.println("=== Staged Files ===");
-        for (Map.Entry<String, String> entry: addStagedFiles.entrySet()) {
+        for (Map.Entry<String, String> entry : addStagedFiles.entrySet()) {
             System.out.println(entry.getKey());
         }
         System.out.println();
         /** print Removed Files. */
         System.out.println("=== Removed Files ===");
         TreeMap<String, String> remStagedFiles = remArea.getStagedFiles();
-        for (Map.Entry<String, String> entry: remStagedFiles.entrySet()) {
+        for (Map.Entry<String, String> entry : remStagedFiles.entrySet()) {
             /** remove the entry in the remStagedArea.*/
             System.out.println(entry.getKey());
         }
@@ -272,8 +292,10 @@ public class Repository implements Serializable {
         System.out.println();
     }
 
-    /** need three different checkOut() method with different num of args
-     * 1. java gitlet.Main checkout -- [file name]. */
+    /**
+     * need three different checkOut() method with different num of args
+     * 1. java gitlet.Main checkout -- [file name].
+     */
     public static void checkoutFile(String checkoutFileName) throws IOException {
         /** read the checkoutBlob from the head Commit.*/
         Commit HEADCommit = readHEADCommit();
@@ -290,7 +312,10 @@ public class Repository implements Serializable {
         }
         writeContents(workingDirFile, checkoutBlobContent);
     }
-    /** 2. java gitlet.Main checkout [commit id] -- [file name]. */
+
+    /**
+     * 2. java gitlet.Main checkout [commit id] -- [file name].
+     */
     public static void checkoutFile(String commitID, String checkoutFileName) throws IOException {
         /** Handle failure cases:
          * when read checkoutCommit, handle the failure case when Commit doesn't exist.*/
@@ -308,7 +333,9 @@ public class Repository implements Serializable {
         writeContents(workingDirFile, checkoutBlobContent);
     }
 
-    /** 3. java gitlet.Main checkout [branch name]. */
+    /**
+     * 3. java gitlet.Main checkout [branch name].
+     */
     public static void checkoutBranch(String branchName) throws IOException {
         /** read current branch. */
         String currBranchName = getCurrBranchName();
@@ -317,7 +344,6 @@ public class Repository implements Serializable {
         /** read checkout branch's commit. */
         String toCheckoutCommitID = readBranch(branchName);
         Commit toCheckoutCommit = readCommitObject(toCheckoutCommitID);
-        TreeMap<String, String> toCheckoutCommitBlobs = toCheckoutCommit.getBlobs();
         /** read staging Area. */
         StagingArea addArea = readStagingArea(STAGED_ADD);
         StagingArea remArea = readStagingArea(STAGED_REM);
@@ -329,6 +355,7 @@ public class Repository implements Serializable {
             printFailMsgAndExit("No need to checkout the current branch.");
         }
         Set<String> untrackedFileSet = getUntrackedFilesSet(currCommit);
+        TreeMap<String, String> toCheckoutCommitBlobs = toCheckoutCommit.getBlobs();
         if (IsACommitOverWriteUntrackedFile(untrackedFileSet, toCheckoutCommitBlobs)) {
             printFailMsgAndExit("There is an untracked file in the way; delete it, or add and commit it first.");
         }
@@ -341,11 +368,13 @@ public class Repository implements Serializable {
         remArea.dump();
     }
 
-    /** create a new branch, but don't switch to it until be checkout. */
+    /**
+     * create a new branch, but don't switch to it until be checkout.
+     */
     public static void branch(String branchName) throws IOException {
         /** handle the failure cases. */
         List<String> existBranches = plainFilenamesIn(BRANCHES_DIR);
-        Set<String > existBranchesSet = new HashSet<>(existBranches);
+        Set<String> existBranchesSet = new HashSet<>(existBranches);
         if (existBranchesSet.contains(branchName)) {
             printFailMsgAndExit("A branch with that name already exists.");
         }
@@ -354,21 +383,23 @@ public class Repository implements Serializable {
         writeBranch(branchName, HEADCommit.getCommitID());
     }
 
-    /** remove the existing branch. */
+    /**
+     * remove the existing branch.
+     */
     public static void rmBranch(String branchName) {
         /** handle the failure cases. */
         File HEADBranch = readHEADBranch();
         File rmBranchFile = join(BRANCHES_DIR, branchName);
         List<String> existBranches = plainFilenamesIn(BRANCHES_DIR);
-        Set<String > existBranchesSet = new HashSet<>(existBranches);
+        Set<String> existBranchesSet = new HashSet<>(existBranches);
         if (!existBranchesSet.contains(branchName)) {
             printFailMsgAndExit("A branch with that name does not exist.");
         }
-        if (HEADBranch == rmBranchFile) {
+        if (HEADBranch.equals(rmBranchFile)) {
             printFailMsgAndExit("Cannot remove the current branch.");
         }
         /** remove the branch.*/
-        restrictedDelete(rmBranchFile);
+        rmBranchFile.delete();
     }
 
     public static void reset(String resetCommitID) throws IOException {
@@ -388,7 +419,7 @@ public class Repository implements Serializable {
             printFailMsgAndExit("There is an untracked file in the way; delete it, or add and commit it first.");
         }
         /** checkout all the files in the corresponding branch. */
-        currCommitBlobs = checkoutFilesInABranch(currCommitBlobs, toCheckoutCommitBlobs);
+        checkoutFilesInABranch(currCommitBlobs, toCheckoutCommitBlobs);
         writeBranch(currBranchName, resetCommitID);
         rmFilesInWorkingDir(currCommitBlobs);
         /** clear the Staged Area.*/
@@ -397,13 +428,16 @@ public class Repository implements Serializable {
     }
 
     public static void merge(String givenBranchName) throws IOException {
-        /** read the staging area.*/
+        /** read staging area, just for handle the failure cases.*/
         StagingArea addArea = readStagingArea(STAGED_ADD);
         StagingArea remArea = readStagingArea(STAGED_REM);
         /** read given branch's commit. */
         String givenBranchCommitID = readBranch(givenBranchName);
         Commit givenBranchCommit = readCommitObject(givenBranchCommitID);
-        TreeMap<String, String> givenBranchCommitBlobs = givenBranchCommit.getBlobs();
+        TreeMap<String, String> givenBranchCommitBlobs = new TreeMap<>();
+        if (givenBranchCommit != null) {
+            givenBranchCommitBlobs = new TreeMap<>(givenBranchCommit.getBlobs());
+        }
         String currBranchName = getCurrBranchName();
         String currBranchCommitID = readHEADCommitID();
         Commit currBranchCommit = readHEADCommit();
@@ -414,7 +448,7 @@ public class Repository implements Serializable {
         if (givenBranchCommitID == null) {
             printFailMsgAndExit("A branch with that name does not exist.");
         }
-        if (givenBranchName == currBranchName) {
+        if (givenBranchName.equals(currBranchName)) {
             printFailMsgAndExit("Cannot merge a branch with itself.");
         }
         Set<String> untrackedFileSet = getUntrackedFilesSet(currBranchCommit);
@@ -430,37 +464,65 @@ public class Repository implements Serializable {
         Commit splitPointCommit = readCommitObject(splitPointCommitID);
 
         /** If the split point is the same commit as the given branch, do nothing. */
-        if (splitPointCommitID == givenBranchCommitID) {
+        if (splitPointCommitID.equals(givenBranchCommitID)) {
             printFailMsgAndExit("Given branch is an ancestor of the current branch.");
         }
         /** If the split point is the current branch, check out the given branch. */
-        if (splitPointCommitID == currBranchCommitID) {
+        if (splitPointCommitID.equals(currBranchCommitID)) {
             checkoutBranch(givenBranchName);
             printFailMsgAndExit("Current branch fast-forwarded.");
         }
 
         /** both branches aren't at the split point. HEAD: currBranch, Other: givenBranch*/
-        TreeMap<String, String> splitPointCommitBlobs = splitPointCommit.getBlobs();
-        TreeMap<String, String> currBranchCommitBlobs = currBranchCommit.getBlobs();
-        //TODO: iterate over all the files show in split point.
-        for (Map.Entry<String, String> entry: splitPointCommitBlobs.entrySet()) {
+        TreeMap<String, String> splitPointCommitBlobs = new TreeMap<>(splitPointCommit.getBlobs());
+        TreeMap<String, String> currBranchCommitBlobs = new TreeMap<>(currBranchCommit.getBlobs());
+
+        //iterate over all the files show in split point.
+        for (Map.Entry<String, String> entry : splitPointCommitBlobs.entrySet()) {
             String splitPointCommitBlobName = entry.getKey();
             String splitPointCommitBlobID = entry.getValue();
             String currBranchCommitBlobID = currBranchCommitBlobs.get(splitPointCommitBlobName);
             String givenBranchCommitBlobID = givenBranchCommitBlobs.get(splitPointCommitBlobName);
-            /** 1. modified in other but not HEAD --> other. */
-            if (givenBranchCommitBlobID != null && !splitPointCommitBlobID.equals(givenBranchCommitBlobID) && splitPointCommitBlobID.equals(currBranchCommitBlobID)) {
-                checkoutFile(givenBranchCommitBlobID, splitPointCommitBlobName);
 
+            /** 1. modified(still exist) in other, but not HEAD --> other. */
+            if (!splitPointCommitBlobID.equals(givenBranchCommitBlobID) && splitPointCommitBlobID.equals(currBranchCommitBlobID)) {
+                checkoutFile(givenBranchCommitBlobID, splitPointCommitBlobName);
+                add(splitPointCommitBlobName);
+            }
+            /** 2. modified(still exist) in HEAD, but not Other -->HEAD (do nothing). */
+            /** 3. unmodified in HEAD, but not present in Other -->REMOVED AND TRACKED. */
+            if (splitPointCommitBlobID.equals(currBranchCommitBlobID) && givenBranchCommitBlobID == null) {
+                rm(splitPointCommitBlobName);
+            }
+            /** 4. unmodified in Other, but not present in HEAD -->remain absent(REMOVED) --> do nothing.*/
+            /** 5.1. modified in Other and HEAD in the same way --> do nothing. */
+            /** 5.2. modified in Other and HEAD in diff ways --> CONFLICT. */
+            boolean fileDiffInThree = checkThreeEquals(splitPointCommitBlobID, givenBranchCommitBlobID, currBranchCommitBlobID);
+            if (fileDiffInThree) {
+                /** Create the new file content, join two file together with the given format. */
+                String newFileContent = joinConflictFileContent(currBranchCommitBlobID, givenBranchCommitBlobID);
+                writeFileContent(splitPointCommitBlobName, newFileContent);
+                add(splitPointCommitBlobName);
+            }
+            /** delete the files from currBranchBlobs and givenBranchBlobs,
+             * to find the files not in split point, but in HEAD or Other .*/
+            currBranchCommitBlobs.remove(splitPointCommitBlobName);
+            givenBranchCommitBlobs.remove(splitPointCommitBlobName);
+            splitPointCommitBlobs.remove(splitPointCommitBlobName);
+        }
+        //iterate over all the files not show in the split point.
+        /** 1. not in Split, nor Other, but in HEAD --> HEAD (do nothing) . */
+        /** 2. not in Split, nor HEAD, but in Other --> Other . */
+        for (Map.Entry<String, String> entry : givenBranchCommitBlobs.entrySet()) {
+            String givenBranchCommitBlobName = entry.getKey();
+            String currBranchCommitBlobID = currBranchCommitBlobs.get(givenBranchCommitBlobName);
+            if (currBranchCommitBlobID == null) {
+                checkoutFile(givenBranchCommitID, givenBranchCommitBlobName);
+                add(givenBranchCommitBlobName);
             }
         }
-
-
-
-
-
-
-        //TODO: iterate over all the files not show in the split point.
-
+        /** Commit.*/
+        String mergeCommitMessage = "Merged " + givenBranchName + " into " + currBranchName;
+        commitMayMerge(mergeCommitMessage, givenBranchCommitID);
     }
 }

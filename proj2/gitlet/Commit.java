@@ -25,21 +25,21 @@ public class Commit implements Serializable {
      */
 
     /** The message of this Commit. */
-    private String message;
+    private final String message;
     /** The commit time.*/
-    private String timestamp;
+    private final String timestamp;
     /** The {name: file's sha1-hash} map, to store the reference of the files/blobs in this commit. */
     private TreeMap<String, String> blobs;
     /** The parent commit.*/
-    private String parentID;
+    private final String parentID;
     /** The second parent ID for the merging commit.*/
-    private String secondParentID;
+    private final String secondParentID;
 
     /* TODO: fill in the rest of this class. */
     public Commit(String message, int time) {
         this.message = message;
         Formatter fmt = new Formatter();
-        this.timestamp = fmt.format("%1$ta %1$tb %1$td %1$tT %1$tY", new Date(Long.valueOf(time))).toString();
+        this.timestamp = fmt.format("%1$ta %1$tb %1$td %1$tT %1$tY", new Date((long) time)).toString();
         this.blobs = new TreeMap<>();
         this.parentID = null;
         this.secondParentID = null;
@@ -52,6 +52,17 @@ public class Commit implements Serializable {
         this.timestamp = fmt.format("%1$ta %1$tb %1$td %1$tT %1$tY", commitDate).toString();
         this.parentID = that.getCommitID();
         this.secondParentID = null;
+        /** deep copy of the parent's blobs.*/
+        this.blobs = new TreeMap<>(that.getBlobs());
+    }
+
+    public Commit(Commit that, String secondParentID, String message) {
+        this.message = message;
+        Date commitDate = new Date();
+        Formatter fmt = new Formatter();
+        this.timestamp = fmt.format("%1$ta %1$tb %1$td %1$tT %1$tY", commitDate).toString();
+        this.parentID = that.getCommitID();
+        this.secondParentID = secondParentID;
         /** deep copy of the parent's blobs.*/
         this.blobs = new TreeMap<>(that.getBlobs());
     }
@@ -76,14 +87,13 @@ public class Commit implements Serializable {
         return readCommitObject(this.parentID);
     }
 
-    public Commit getSecondParent() {
-        return readCommitObject(this.secondParentID);
+    public Commit getSecondParent(String secondParentID) {
+        return readCommitObject(secondParentID);
     }
 
     public String getCommitID() {
         return sha1((Object) serialize(this));
     }
-
 
     public static void main(String[] args) throws InterruptedException {
         Commit testCommit2 = new Commit("initial commit", 0);

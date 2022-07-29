@@ -5,9 +5,15 @@ import byow.TileEngine.TETile;
 
 public class Engine {
     TERenderer ter = new TERenderer();
+    TETile[][] world;
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
+
+    public Engine() {
+        this.ter.initialize(WIDTH, HEIGHT);
+        this.world = new TETile[WIDTH][HEIGHT];
+    }
 
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
@@ -47,6 +53,14 @@ public class Engine {
         // that works for many different input types.
 
         TETile[][] finalWorldFrame = null;
+        RogWorld rw = new RogWorld(input);
+
         return finalWorldFrame;
+    }
+
+    public static void main(String[] args) {
+        Engine rogEngine = new Engine();
+        rogEngine.world = rogEngine.interactWithInputString("n123s");
+        rogEngine.ter.renderFrame(rogEngine.world);
     }
 }

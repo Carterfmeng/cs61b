@@ -1,4 +1,5 @@
 package byow.lab12;
+import byow.Core.Position;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -6,7 +7,6 @@ import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
-import javax.xml.crypto.dsig.spec.XSLTTransformParameterSpec;
 import java.util.Random;
 
 /**
@@ -18,20 +18,6 @@ public class HexWorld {
 
     private static final long SEED = 23333;
     private static final Random RANDOM = new Random(SEED);
-
-    private static class Position {
-        private int x;
-        private int y;
-
-        Position(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        Position shiftPosition(int dx, int dy) {
-            return new Position(this.x + dx, this.y + dy);
-        }
-    }
 
     private static void addHexagonWithRandomTile(TETile[][] world, int s, Position p) {
         int tileNum = RANDOM.nextInt(3);
@@ -60,16 +46,16 @@ public class HexWorld {
     }
 
     private static void drawRectangle(TETile[][] world, int s, Position p, TETile t) {
-        for (int x = p.x; x < p.x + s; x += 1) {
-            for (int y = p.y; y < p.y + s * 2; y += 1) {
+        for (int x = p.getX(); x < p.getX() + s; x += 1) {
+            for (int y = p.getY(); y < p.getY() + s * 2; y += 1) {
                 world[x][y] = t;
             }
         }
     }
 
     private static void drawTriangle(TETile[][] world, int s, Position p, TETile t, int direction) {
-        int px = p.x;
-        int py = p.y;
+        int px = p.getX();
+        int py = p.getY();
         int x = px;
         for (int offSet = 0; Math.abs(offSet) < s; offSet += direction) {
             for (int y = py + Math.abs(offSet); y < py + s * 2 - 2 - Math.abs(offSet); y += 1) {

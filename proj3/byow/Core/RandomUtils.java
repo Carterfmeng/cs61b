@@ -105,7 +105,7 @@ public class RandomUtils {
     }
 
     /**
-     * Returns a random boolean from a Bernoulli distribution with success
+     * Returns a random ba Bernoulli distrioolean from bution with success
      * probability <em>p</em>.
      *
      * @param p the probability of returning {@code true}

@@ -49,6 +49,7 @@ public class RogWorld {
         TERenderer ter = new TERenderer();
         ter.initialize(Engine.WIDTH, Engine.HEIGHT);
         RogWorld rw = new RogWorld("n123S");
+        DrawUnit.drawARoom(rw.rogTiles, new Position(1,1), new Position(5,7));
         ter.renderFrame(rw.rogTiles);
     }
 }

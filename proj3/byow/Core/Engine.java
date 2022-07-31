@@ -4,11 +4,12 @@ import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 
 public class Engine {
-    TERenderer ter = new TERenderer();
-    TETile[][] world;
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
+
+    TERenderer ter = new TERenderer();
+    TETile[][] world;
 
     public Engine() {
         this.ter.initialize(WIDTH, HEIGHT);

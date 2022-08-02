@@ -10,6 +10,7 @@ import java.util.PriorityQueue;
 import java.util.Random;
 
 import static byow.Core.DrawUtils.*;
+import static byow.Core.RandomUtils.*;
 
 public class RogWorld {
     /** the first random generating room's ldPos.*/
@@ -18,7 +19,7 @@ public class RogWorld {
     public static final Position END_RUPOS = new Position(Engine.WIDTH - 1, Engine.HEIGHT - 1);
     public static final Room START_RANGE = new Room(START_RANGE_LDPOS, START_RANGE_RUPOS);
     /** Max room edge length.*/
-    public static final int MAX_EDGE_LENGTH = 10;
+    public static final int MAX_EDGE_LENGTH = 8;
     /** the whole Room of RogWord to render.*/
     public static final Room WORLD_ROOM = new Room(START_RANGE_LDPOS, END_RUPOS);
 
@@ -123,11 +124,15 @@ public class RogWorld {
         }
         return false;
     }
+
     /** Create a random room in a specific Pos, if the room is ok to create, then
      * create it and return ture. Otherwise, return false.*/
-    private boolean createARandomRoom(Position ldPos) {
+    public boolean createARandomRoom(Position ldPos) {
         return createARandomRoom(new Room(ldPos, ldPos));
     }
+
+
+
 
     /** own main method for test.*/
     public static void main(String[] args) {

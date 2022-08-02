@@ -5,7 +5,7 @@ public class Room {
     private Position ldPos;
     private Position ruPos;
     private boolean isMarked;
-    /** use storeEdges() to preserve the edges once the room is created to the world.
+    /** use storeEdges() to preserve the edges once the room is drawn to the world.
      * Otherwise, is null. Indices for edges: bottom: 0, left: 1, top: 2, right: 3 */
     private Edge[] edges;
 

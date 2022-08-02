@@ -69,7 +69,7 @@ public class DrawUtils {
     }
 
     /** Draw a room with specific LeftDown pos and RightUp pos.*/
-    public static void drawARoom(TETile[][] world, Position ldPos, Position ruPos) {
+    private static void drawARoom(TETile[][] world, Position ldPos, Position ruPos) {
         int xLen = ruPos.getX() - ldPos.getX() + 1;
         int yLen = ruPos.getY() - ldPos.getY() + 1;
         drawARowFromLeft(world, ldPos, xLen, WALL);
@@ -79,8 +79,10 @@ public class DrawUtils {
         fillARoom(world, ldPos, ruPos);
     }
 
+    /** Draw a room with specific LeftDown pos and RightUp pos.*/
     public static void drawARoom(TETile[][] world, Room room) {
         drawARoom(world, room.getLdPos(), room.getRuPos());
+        room.storeEdges();
     }
 
 

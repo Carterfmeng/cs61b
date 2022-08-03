@@ -96,10 +96,16 @@ public class RogWorld {
         return checkARoomIn(r, WORLD_ROOM);
     }
 
+    private boolean checkRoomPosesIn(Room r, Room range) {
+        boolean checkLPos = checkPosIn(r.getLdPos(), range) || checkPosIn(r.getLuPos(), range);
+        boolean checkRPos = checkPosIn(r.getRdPos(), range) || checkPosIn(r.getRuPos(), range);
+        return checkLPos || checkRPos;
+    }
+
     /** check a Room r isn't intersect with existing rooms.*/
     public boolean checkARoomNoIntersection(Room r) {
         for (Room temp : this.rooms) {
-            if (checkPosIn(temp.getLdPos(), r) || checkPosIn(temp.getRuPos(), r)) {
+            if (checkRoomPosesIn(temp, r) || checkRoomPosesIn(r, temp)) {
                 return false;
             }
         }
@@ -175,6 +181,10 @@ public class RogWorld {
         return false;
     }
 
+    private void openATile(Position p){
+        this.rogTiles[p.getX()][p.getY()] = FLOOR;
+    }
+
 
     /** For each edge, ADJ_ROOM_P's probability to pick a random Pos, Try MAX_TRY_TIME times
      * to generate a random room until success.*/
@@ -183,11 +193,13 @@ public class RogWorld {
            boolean toTrySpread = bernoulli(this.random, ADJ_ROOM_P);
            if (toTrySpread) {
                Position openPos = getRandomPos(this.random, e);
-               System.out.println("DEBUG: " + "openPos" + openPos.getX() + " " + openPos.getY());
                Position randomRoomEdgePos = e.shiftPosOnTheEdge(openPos);
-               System.out.println("DEBUG: " + randomRoomEdgePos.getX() + " " + randomRoomEdgePos.getY());
                if (randomRoomEdgePos != null) {
-                    createARandomRoomNTimes(randomRoomEdgePos, e, MAX_TRY_TIMES);
+                    boolean isNeedOpen = createARandomRoomNTimes(randomRoomEdgePos, e, MAX_TRY_TIMES);
+                    if (isNeedOpen) {
+                        openATile(openPos);
+                        openATile(randomRoomEdgePos);
+                    }
                }
            }
         }
@@ -209,6 +221,25 @@ public class RogWorld {
         RogWorld rw = new RogWorld("n124564s");
         rw.createStartRoom();
         rw.spreadARoom();
+        rw.spreadARoom();
+        rw.spreadARoom();
+        rw.spreadARoom();
+        rw.spreadARoom();
+        rw.spreadARoom();
+        rw.spreadARoom();
+        rw.spreadARoom();
+        rw.spreadARoom();
+        rw.spreadARoom();
+        rw.spreadARoom();
+        rw.spreadARoom();
+        rw.spreadARoom();
+        rw.spreadARoom();
+        rw.spreadARoom();
+        rw.spreadARoom();
+        rw.spreadARoom();
+        rw.spreadARoom();
+
+
         ter.renderFrame(rw.rogTiles);
     }
 }

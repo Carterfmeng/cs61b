@@ -72,26 +72,26 @@ public class Room {
             Position ldPos;
             Position ruPos;
             if (this.edgeIndex == 0) {
-                Position ruPosRangeS = startPos.shiftPosition(-xLen + 1, 0);
-                Position ruPosRangeE = startPos.shiftPosition(xLen - 1, 0);
+                Position ruPosRangeS = startPos.shiftPosition(1, 0);
+                Position ruPosRangeE = startPos.shiftPosition(xLen - 2, 0);
                 ruPos = getRandomPos(random, new Room(ruPosRangeS, ruPosRangeE));
                 ldPos = ruPos.shiftPosition(-xLen + 1, -yLen + 1);
                 return new Room(ldPos,ruPos);
             } else if (this.edgeIndex == 1) {
-                Position ruPosRangeS = startPos.shiftPosition(0, -yLen + 1);
-                Position ruPosRangeE = startPos.shiftPosition(0, yLen - 1);
+                Position ruPosRangeS = startPos.shiftPosition(0, 1);
+                Position ruPosRangeE = startPos.shiftPosition(0, yLen - 2);
                 ruPos = getRandomPos(random, new Room(ruPosRangeS, ruPosRangeE));
                 ldPos = ruPos.shiftPosition(-xLen + 1, -yLen + 1);
                 return new Room(ldPos,ruPos);
             } else if (this.edgeIndex == 2) {
-                Position ldPosRangeS = startPos.shiftPosition(-xLen + 1, 0);
-                Position ldPosRangeE = startPos.shiftPosition(xLen - 1, 0);
+                Position ldPosRangeS = startPos.shiftPosition(-xLen + 2, 0);
+                Position ldPosRangeE = startPos.shiftPosition(-1, 0);
                 ldPos = getRandomPos(random, new Room(ldPosRangeS, ldPosRangeE));
                 ruPos = ldPos.shiftPosition(xLen - 1, yLen - 1);
                 return new Room(ldPos,ruPos);
             } else if (this.edgeIndex == 3) {
-                Position ldPosRangeS = startPos.shiftPosition(0, -yLen + 1);
-                Position ldPosRangeE = startPos.shiftPosition(0, yLen - 1);
+                Position ldPosRangeS = startPos.shiftPosition(0, -yLen + 2);
+                Position ldPosRangeE = startPos.shiftPosition(0, -1);
                 ldPos = getRandomPos(random, new Room(ldPosRangeS, ldPosRangeE));
                 ruPos = ldPos.shiftPosition(xLen - 1, yLen - 1);
                 return new Room(ldPos,ruPos);
@@ -129,9 +129,30 @@ public class Room {
         return this.ruPos;
     }
 
+    public int getXLen() {
+        return this.ruPos.getX() - this.ldPos.getX() + 1;
+    }
+
+    public int getYLen() {
+        return this.ruPos.getY() - this.ldPos.getY() + 1;
+    }
+
+    public Position getLuPos() {
+        int LuPosX = this.ldPos.getX();
+        int LuPosY = this.ldPos.getY() + getYLen() - 1;
+        return new Position(LuPosX, LuPosY);
+    }
+
+    public Position getRdPos() {
+        int RdPosX = this.ruPos.getX();
+        int RdPosY = this.ruPos.getY() - getYLen() + 1;
+        return new Position(RdPosX, RdPosY);
+    }
+
     public Edge[] getEdges() {
         return this.edges;
     }
+
     public void setMarked() {
         this.isMarked = true;
     }

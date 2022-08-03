@@ -110,7 +110,10 @@ public class DrawUtils {
             ldPos = e.endPos;
             ruPos = e.startPos;
         }
-        return getRandomPos(random, ldPos, ruPos);
+        if (ldPos.getX() == ruPos.getX()) {
+            return getRandomPos(random, ldPos.shiftPosition(0, 1), ruPos.shiftPosition(0, -1));
+        }
+        return  getRandomPos(random, ldPos.shiftPosition(1, 0), ruPos.shiftPosition(-1, 0));
     }
 
     /** return a random Room in the specific ldPos with random xLen & yLen. */

@@ -22,16 +22,23 @@ public class RogWorld {
     public static final int MIN_EDGE_LENGTH = 3;
     /** the whole Room of RogWord to render.*/
     public static final Room WORLD_ROOM = new Room(START_RANGE_LDPOS, END_RUPOS);
+    /** the shrink distance of RogWord to generate the room (minimum distance to the edge).*/
+    public static final int SHRINK_DIS = 3;
+    /** the whole Room of RogWord to generate rooms.*/
+    public static final Room WORLD_SHRINK_ROOM = new Room(START_RANGE_LDPOS.shiftPosition(SHRINK_DIS,SHRINK_DIS), END_RUPOS.shiftPosition(-SHRINK_DIS, -SHRINK_DIS));
     /** probability to create an adjacent room on the edge.*/
     public static final double ADJ_ROOM_P = 0.50;
     /** MAX_TRY_TIMES to generate a room.*/
     public static final int MAX_TRY_TIMES = 5;
+    /** MAX_AREA_RATE = Rooms Area / WORLD_ROOM Area, to stop spreading rooms.*/
+    public static final double MAX_AREA_RATE = 0.5;
 
     private long seed;
     private Random random;
     private TETile[][] rogTiles;
     private HashSet<Room> rooms;
     private List<Room> unSpreadRooms;
+    private int totalRoomsArea;
 
     public RogWorld(String input) {
         this.seed = findTheSeed(input);
@@ -41,6 +48,7 @@ public class RogWorld {
         this.fillWorldNull();
         this.rooms = new HashSet<>();
         this.unSpreadRooms = new ArrayList<>();
+        this.totalRoomsArea = 0;
     }
 
     /** Return the seed (positive long) in the input,
@@ -91,9 +99,9 @@ public class RogWorld {
         return false;
     }
 
-    /** check a Room r is in the world. */
+    /** check a Room r is in the shrink world. */
     public boolean checkARoomIn(Room r) {
-        return checkARoomIn(r, WORLD_ROOM);
+        return checkARoomIn(r, WORLD_SHRINK_ROOM);
     }
 
     private boolean checkRoomPosesIn(Room r, Room range) {
@@ -126,8 +134,8 @@ public class RogWorld {
         Room r = getRandomRoom(this.random, range);
         if (checkRoomValidation(r)) {
             drawARoom(this.rogTiles, r);
-            System.out.println("DEBUG: StartRoom" + r.getLdPos().getX() + "," + r.getLdPos().getY());
             this.rooms.add(r);
+            this.totalRoomsArea += r.getRoomArea();
             this.unSpreadRooms.add(r);
             return true;
         }
@@ -159,6 +167,7 @@ public class RogWorld {
             if (checkRoomValidation(r)) {
                 drawARoom(this.rogTiles, r);
                 this.rooms.add(r);
+                this.totalRoomsArea += r.getRoomArea();
                 this.unSpreadRooms.add(r);
                 return true;
             }
@@ -172,7 +181,6 @@ public class RogWorld {
     private boolean createARandomRoomNTimes(Position startPos, Room.Edge e, int times) {
         while (times > 0) {
             boolean isSuc = createARandomRoom(startPos, e);
-            System.out.println("DEBUG: ++" + startPos + " " + e.edgeIndex);
             times = times - 1;
             if (isSuc) {
                 return true;
@@ -208,38 +216,46 @@ public class RogWorld {
     public void spreadARoom() {
         if (!this.unSpreadRooms.isEmpty()) {
             Room r = this.unSpreadRooms.remove(0);
-            System.out.print("DEBUG: ");
-            System.out.print(r);
             spreadARoom(r);
         }
+    }
+
+    /** Try to spread all exist rooms one round, if it's done, return true.*/
+    public boolean spreadExistRoomsOneRound() {
+        while (!this.unSpreadRooms.isEmpty()) {
+            this.spreadARoom();
+        }
+        if (this.unSpreadRooms.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
+    /** remark all the spread rooms, and ready to start another round.*/
+    private void remarkAllExistRooms() {
+        this.unSpreadRooms.addAll(this.rooms);
+    }
+
+    public void generateRogWorld() {
+        this.createStartRoom();
+        this.spreadExistRoomsOneRound();
+        while ((this.totalRoomsArea * 1.0 / WORLD_ROOM.getRoomArea()) < MAX_AREA_RATE) {
+            boolean oneRoundFinish = this.spreadExistRoomsOneRound();
+            if (oneRoundFinish) {
+                remarkAllExistRooms();
+            }
+        }
+        this.unSpreadRooms.clear();
+
+
     }
 
     /** own main method for test.*/
     public static void main(String[] args) {
         TERenderer ter = new TERenderer();
         ter.initialize(Engine.WIDTH, Engine.HEIGHT);
-        RogWorld rw = new RogWorld("n124564s");
-        rw.createStartRoom();
-        rw.spreadARoom();
-        rw.spreadARoom();
-        rw.spreadARoom();
-        rw.spreadARoom();
-        rw.spreadARoom();
-        rw.spreadARoom();
-        rw.spreadARoom();
-        rw.spreadARoom();
-        rw.spreadARoom();
-        rw.spreadARoom();
-        rw.spreadARoom();
-        rw.spreadARoom();
-        rw.spreadARoom();
-        rw.spreadARoom();
-        rw.spreadARoom();
-        rw.spreadARoom();
-        rw.spreadARoom();
-        rw.spreadARoom();
-
-
+        RogWorld rw = new RogWorld("n154s");
+        rw.generateRogWorld();
         ter.renderFrame(rw.rogTiles);
     }
 }

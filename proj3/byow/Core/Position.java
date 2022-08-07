@@ -9,6 +9,11 @@ public class Position {
         this.y = y;
     }
 
+    @Override
+    public String toString() {
+        return "(" + this.x + ", " + this.y + ")";
+    }
+
     public Position shiftPosition(int dx, int dy) {
         return new Position(this.x + dx, this.y + dy);
     }

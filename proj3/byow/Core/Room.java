@@ -12,6 +12,7 @@ public class Room {
     /** use storeEdges() to preserve the edges once the room is drawn to the world.
      * Otherwise, is null. Indices for edges: bottom: 0, left: 1, top: 2, right: 3 */
     private Edge[] edges;
+    private int roomArea;
 
     /** Edge start from startPos, end at endPos, A room has two edges start from ldPos, two
      * edges start from ruPos.*/
@@ -105,6 +106,18 @@ public class Room {
         this.ruPos = ruPos;
         this.isMarked = false;
         this.edges = null;
+        this.roomArea = computeRoomArea();
+    }
+
+    @Override
+    public String toString() {
+        return "Room: [" + this.ldPos.toString() + this.ruPos.toString() + "]";
+    }
+
+    private int computeRoomArea() {
+        int xLen = getXLen();
+        int yLen = getYLen();
+        return xLen * yLen;
     }
 
     public Edge computeEdge(Position startPos, Position endPos) {
@@ -149,6 +162,9 @@ public class Room {
         return new Position(RdPosX, RdPosY);
     }
 
+    public int getRoomArea() {
+        return this.roomArea;
+    }
     public Edge[] getEdges() {
         return this.edges;
     }

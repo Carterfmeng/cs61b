@@ -110,10 +110,35 @@ public class RogWorld {
         return checkLPos || checkRPos;
     }
 
+    /** Check if two rooms intersecting, but with no vertexes in both area .*/
+    private boolean checkTwoRoomCrossIntersection(Room r, Room range) {
+        boolean firstCheckLdX = r.getLdPos().getX() > range.getLdPos().getX();
+        boolean firstCheckRuX = r.getRuPos().getX() < range.getRuPos().getX();
+        boolean firstCheckLdY = r.getLdPos().getY() > range.getLdPos().getY();
+        boolean firstCheckRuY = r.getRuPos().getY() < range.getRuPos().getY();
+        if (firstCheckLdX && firstCheckRuX) {
+            boolean secondCheckLdY = r.getLdPos().getY() < range.getLdPos().getY();
+            boolean secondCheckRuY = r.getRuPos().getY() > range.getRuPos().getY();
+            if (secondCheckLdY && secondCheckRuY) {
+                return true;
+            }
+        } else if (firstCheckLdY && firstCheckRuY) {
+            boolean secondCheckLdX = r.getLdPos().getX() < range.getLdPos().getX();
+            boolean secondCheckRuX = r.getRuPos().getX() > range.getRuPos().getX();
+            if (secondCheckLdX && secondCheckRuX) {
+                return true;
+            }
+        }
+        return false;
+    }
     /** check a Room r isn't intersect with existing rooms.*/
     public boolean checkARoomNoIntersection(Room r) {
         for (Room temp : this.rooms) {
             if (checkRoomPosesIn(temp, r) || checkRoomPosesIn(r, temp)) {
+                return false;
+            }
+            /** Check if two rooms intersecting, but with no vertexes in both area.*/
+            else if (checkTwoRoomCrossIntersection(r, temp)) {
                 return false;
             }
         }
@@ -237,8 +262,7 @@ public class RogWorld {
     }
 
     public void generateRogWorld() {
-        this.createStartRoom();
-        this.spreadExistRoomsOneRound();
+        createStartRoom();
         while ((this.totalRoomsArea * 1.0 / WORLD_ROOM.getRoomArea()) < MAX_AREA_RATE) {
             boolean oneRoundFinish = this.spreadExistRoomsOneRound();
             if (oneRoundFinish) {
@@ -246,15 +270,13 @@ public class RogWorld {
             }
         }
         this.unSpreadRooms.clear();
-
-
     }
 
     /** own main method for test.*/
     public static void main(String[] args) {
         TERenderer ter = new TERenderer();
         ter.initialize(Engine.WIDTH, Engine.HEIGHT);
-        RogWorld rw = new RogWorld("n154s");
+        RogWorld rw = new RogWorld("n54676s");
         rw.generateRogWorld();
         ter.renderFrame(rw.rogTiles);
     }

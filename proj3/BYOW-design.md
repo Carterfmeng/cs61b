@@ -141,6 +141,38 @@ the one edge of a room, may got 4 different type, corresponding to different edg
 
 ****
 
+### Class DrawUtils
+
+contains helper methods to draw the rooms in a world with some randomenss. Meanwhile, do some validation check.
+
+#### public methods
+
+1. `public static void drawARoom(TETile[][] world, Room room)` Draw a room with specific LeftDown pos and RightUp pos.
+
+2. `public static Position getRandomPos(Random random, Room room)` Return a random Position in a rectangle area (room range).
+
+3. `public static Position getRandomPos(Random random, Room.Edge e)` Return a random Position on an edge.
+
+4. `public static Room getRandomRoom(Random random, Room range)` Return a random Room in the specific range with random xLen & yLen.
+
+5. `public static Room getRandomRoom(Random random, Position startPos, Room.Edge e)` Return a random Room in the specific position on an edge with random xLen & yLen.
+
+****
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ***
 
 ## Persistence

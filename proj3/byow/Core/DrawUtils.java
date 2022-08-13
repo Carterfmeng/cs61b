@@ -14,32 +14,32 @@ public class DrawUtils {
     public static final TETile NOTHING = Tileset.NOTHING;
 
     /** Draw a row from left start point with specific tile.*/
-    public static void drawARowFromLeft(TETile[][] world, Position pos, int len, TETile t) {
+    private static void drawARowFromLeft(TETile[][] world, Position pos, int len, TETile t) {
         for (int dx = 0; dx < len; dx++) {
             world[pos.getX() + dx][pos.getY()] = t;
         }
     }
     /** Draw a row from right start point with specific tile.*/
-    public static void drawARowFromRight(TETile[][] world, Position pos, int len, TETile t) {
+    private static void drawARowFromRight(TETile[][] world, Position pos, int len, TETile t) {
         for (int dx = 0; dx < len; dx++) {
             world[pos.getX() - dx][pos.getY()] = t;
         }
     }
     /** Draw a column from bottom start point with specific tile.*/
-    public static void drawAColumnFromBottom(TETile[][] world, Position pos, int len, TETile t) {
+    private static void drawAColumnFromBottom(TETile[][] world, Position pos, int len, TETile t) {
         for (int dy = 0; dy < len; dy++) {
             world[pos.getX()][pos.getY() + dy] = t;
         }
     }
     /** Draw a column from top start point with specific tile.*/
-    public static void drawAColumnFromTop(TETile[][] world, Position pos, int len, TETile t) {
+    private static void drawAColumnFromTop(TETile[][] world, Position pos, int len, TETile t) {
         for (int dy = 0; dy < len; dy++) {
             world[pos.getX()][pos.getY() - dy] = t;
         }
     }
 
     /** Fill a Room's floor tiles.*/
-    public static void fillARoom(TETile[][] world, Position ldPos, Position ruPos) {
+    private static void fillARoom(TETile[][] world, Position ldPos, Position ruPos) {
         ldPos = ldPos.shiftPosition(1,1);
         ruPos = ruPos.shiftPosition(-1, -1);
         int xLen = ruPos.getX() - ldPos.getX() + 1;
@@ -49,12 +49,12 @@ public class DrawUtils {
         }
     }
 
-    public static void fillARoom(TETile[][] world, Room room) {
+    private static void fillARoom(TETile[][] world, Room room) {
         fillARoom(world, room.getLdPos(), room.getRuPos());
     }
 
     /** check the given pos is in the given room/range. */
-    public static boolean checkPosValidation(Position pos, Room room) {
+    private static boolean checkPosValidation(Position pos, Room room) {
         boolean xValidation = pos.getX() <= room.getRuPos().getX() && pos.getX() >= room.getLdPos().getX();
         boolean yValidation = pos.getY() <= room.getRuPos().getY() && pos.getY() >= room.getLdPos().getY();
         if (xValidation && xValidation) {
@@ -64,7 +64,7 @@ public class DrawUtils {
     }
 
     /** check the given pos is in the given room/range. */
-    public static boolean checkPosValidation(Position pos) {
+    private static boolean checkPosValidation(Position pos) {
         return checkPosValidation(pos, RogWorld.WORLD_ROOM);
     }
 
@@ -88,21 +88,22 @@ public class DrawUtils {
 
     /** Below are all random generating methods. */
     /** return a random length in [a, b]. */
-    public static int getRandomLength(Random random, int a, int b) {
+    private static int getRandomLength(Random random, int a, int b) {
         return uniform(random, a, b + 1);
     }
 
     /** return a random Position in a rectangle area.*/
-    public static Position getRandomPos(Random random, Position ldPos, Position ruPos) {
+    private static Position getRandomPos(Random random, Position ldPos, Position ruPos) {
         int x = uniform(random, ldPos.getX(), ruPos.getX() + 1);
         int y = uniform(random, ldPos.getY(), ruPos.getY() + 1);
         return new Position(x, y);
     }
 
+    /** return a random Position in a rectangle area (room range).*/
     public static Position getRandomPos(Random random, Room room) {
         return getRandomPos(random, room.getLdPos(), room.getRuPos());
     }
-
+    /** return a random Position on an edge.*/
     public static Position getRandomPos(Random random, Room.Edge e) {
         Position ldPos = e.startPos;
         Position ruPos = e.endPos;
@@ -117,7 +118,7 @@ public class DrawUtils {
     }
 
     /** return a random Room in the specific ldPos with random xLen & yLen. */
-    public static Room getRandomRoom(Random random, Position ldPos) {
+    private static Room getRandomRoom(Random random, Position ldPos) {
         int xLen = getRandomLength(random, RogWorld.MIN_EDGE_LENGTH, RogWorld.MAX_EDGE_LENGTH);
         int yLen = getRandomLength(random, RogWorld.MIN_EDGE_LENGTH, RogWorld.MAX_EDGE_LENGTH);
         int ruPosX = ldPos.getX() + xLen - 1;
@@ -125,11 +126,14 @@ public class DrawUtils {
         Position ruPos = new Position(ruPosX, ruPosY);
         return new Room(ldPos,ruPos);
     }
+
+    /** return a random Room in the specific range with random xLen & yLen.*/
     public static Room getRandomRoom(Random random, Room range) {
         Position ldPos = getRandomPos(random, range);
         return getRandomRoom(random, ldPos);
     }
 
+    /** return a random Room in the specific position on an edge with random xLen & yLen.*/
     public static Room getRandomRoom(Random random, Position startPos, Room.Edge e) {
         int xLen = getRandomLength(random, RogWorld.MIN_EDGE_LENGTH, RogWorld.MAX_EDGE_LENGTH);
         int yLen = getRandomLength(random, RogWorld.MIN_EDGE_LENGTH, RogWorld.MAX_EDGE_LENGTH);

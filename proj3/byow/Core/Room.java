@@ -127,7 +127,7 @@ public class Room {
         return xLen * yLen;
     }
 
-    public Edge computeEdge(Position startPos, Position endPos) {
+    private Edge computeEdge(Position startPos, Position endPos) {
         return new Edge(startPos, endPos);
     }
 

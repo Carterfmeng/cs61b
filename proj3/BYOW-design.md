@@ -71,7 +71,7 @@ The Random generated world, contains the main logic of our random word generatio
 
 3. `private TETile[][] rogTiles` the generated world.
 
-4.  `private HashSet<Room> rooms` the already generated rooms to the world.
+4. `private HashSet<Room> rooms` the already generated rooms to the world.
 
 5. `private List<Room> unSpreadRooms` the list of rooms waiting to generate adjacent rooms.
 
@@ -141,9 +141,55 @@ the one edge of a room, may got 4 different type, corresponding to different edg
 
 ****
 
+### Class RogWorld
+
+Contains the main logic of our random word generation, where process the input string and generate the tile-based world.
+
+#### public methods
+
+1. `public RogWorld(String input)` the constructor of RogWorld class.
+
+2. `public long findTheSeed(String input)` Return the seed (positive long) in the input,  if there's no valid seed, return -1.
+
+3. `public boolean checkPosIn(Position p, Room range)` check a Pos is in the range.
+
+4. `public boolean checkPosIn(Position p)` check a Pos is in the world.
+
+5. `public boolean checkARoomIn(Room r, Room range)` check a Room r is in the range.
+
+6. `public boolean checkARoomIn(Room r)` check a Room r is in the shrink world.
+
+7. `public boolean checkARoomNoIntersection(Room r)` check a Room r isn't intersect with existing rooms. it has two steps: 
+   
+   a. check corner position is not in the exsiting rooms or the existing rooms' corner position not in the room's area. otherwise return false.
+   
+   b. if a is true, check two rooms no cross intersection (no corner position in each other but intersect)
+
+8. `public boolean checkRoomValidation(Room r)` check a given room is OK to generating: 1) room in the world area; 2) room no intersection with existing rooms.
+
+9. `public boolean createARandomRoomInRange(Room range)` Create a random room in a specific range, if the room is ok to create, then create it and return ture. Otherwise, return false.
+
+10. `public boolean createARandomRoomInRange(Position ldPos)` Create a random room in ldPos, if the room is ok to create, then create it and return ture. Otherwise, return false.
+
+11. `public void spreadARoom()` try to generate rooms from the four edges of a unspread room one time, if the unSpreadRooms is empty, do nothing.
+
+12. `public boolean spreadExistRoomsOneRound()` Try to spread all exist rooms one round, if it's done, return true.
+
+13. `public void generateRogWorld()` the main logic to generate a random world, it contains these subroutines:
+    
+    a. create a random start room(random postion, random size), mark it unspread;
+    
+    b. while the existing rooms area don't reach the stop point, spread the unspread rooms one round (continue spread rooms until all the rooms are not unspread).
+    
+    c. if the existing rooms area still not reach the stop point, remark existing rooms unspread, go back to b. step again.
+    
+    d. when existing rooms area reach the stop point, stop generating process.
+
+****
+
 ### Class DrawUtils
 
-contains helper methods to draw the rooms in a world with some randomenss. Meanwhile, do some validation check.
+Contains helper methods to draw the rooms in a world with some randomenss. Meanwhile, do some validation check.
 
 #### public methods
 
@@ -159,19 +205,59 @@ contains helper methods to draw the rooms in a world with some randomenss. Meanw
 
 ****
 
+### Class Position
 
+The ADT for position (x,y), can easily shift position to get the new one.
 
+#### public methods
 
+1. `public Position(int x, int y)` Constructor of the position class.
 
+2. `public Position shiftPosition(int dx, int dy)` shift the position with dx, dy offsets.
 
+3. `public int getX()` return the x index.
 
+4. `public int getY()` return the y index.
 
+****
 
+### Class Room
 
+Compute and store the useful room properties, such as edges, corner positions, area, etc.
 
+#### public methods
 
+1. `public Room(Position ldPos, Position ruPos)` Constructor of the Room class.
 
+2. `public void storeEdges()`  preserve the edges once the room is created to the world. Otherwise, is null.  Indices for edges: bottom: 0, left: 1, top: 2, right: 3.
 
+3. `public Position getLdPos()` return ldPos.
+
+4. `public Position getRuPos()` return ruPos.
+
+5. `public int getXLen()` return room's x length(horizontal edge).
+
+6. `public int getYLen()` return room's y length(vertical edge).
+
+7. `public Position getLuPos()` return luPos.
+
+8. `public Position getRdPos()` return rdPos.
+
+9. `public int getRoomArea()` return room's area.
+
+10. `public Edge[] getEdges()` return room's edges, indices for edges: bottom: 0, left: 1, top: 2, right: 3.
+
+### Inner Class Edge
+
+Compute the edge attributes and do some edge based operations.
+
+#### methods
+
+1. `Edge(Position startPos, Position endPos)` Constructor of Edge class.
+
+2. `Position shiftPosOnTheEdge(Position toShiftedPos)` shift a edge's position out    for one offset.
+
+3. `Room generateARoomOnEdge(Random random, Position startPos, int xLen, int yLen)` generate a random room at an adjacent position of a room's edge.
 
 ***
 

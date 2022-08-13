@@ -6,22 +6,30 @@ import java.util.Random;
 import static byow.Core.DrawUtils.*;
 
 public class Room {
+    /** the left down position of the room.*/
     private Position ldPos;
+    /** the right up(top) position of the room.*/
     private Position ruPos;
-    private boolean isMarked;
     /** use storeEdges() to preserve the edges once the room is drawn to the world.
      * Otherwise, is null. Indices for edges: bottom: 0, left: 1, top: 2, right: 3 */
     private Edge[] edges;
+    /** the room's area.*/
     private int roomArea;
 
     /** Edge start from startPos, end at endPos, A room has two edges start from ldPos, two
      * edges start from ruPos.*/
     class Edge {
+        /** the length of the edge.*/
         int edgeLen;
+        /** the start position of the edge (one of the room's ldPos / ruPos).*/
         Position startPos;
+        /** the end position of the edge.*/
         Position endPos;
+        /** the index 0/2 edge corresponding to the horizontal edge, return true, else return false.*/
         boolean isHorizontal;
+        /** the index 0/1 edge corresponding to the ldStartEdge, return true, else return false.*/
         boolean isLdStartEdge;
+        /** the index(type) of the edge: bottom: 0, left: 1, top: 2, right: 3.*/
         int edgeIndex;
 
         Edge(Position startPos, Position endPos) {
@@ -104,7 +112,6 @@ public class Room {
     public Room(Position ldPos, Position ruPos) {
         this.ldPos = ldPos;
         this.ruPos = ruPos;
-        this.isMarked = false;
         this.edges = null;
         this.roomArea = computeRoomArea();
     }
@@ -168,13 +175,4 @@ public class Room {
     public Edge[] getEdges() {
         return this.edges;
     }
-
-    public void setMarked() {
-        this.isMarked = true;
-    }
-
-    public boolean getIsMarked() {
-        return this.isMarked;
-    }
-
 }

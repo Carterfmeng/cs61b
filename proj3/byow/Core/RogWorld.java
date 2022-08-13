@@ -11,14 +11,14 @@ import static byow.Core.DrawUtils.*;
 import static byow.Core.RandomUtils.*;
 
 public class RogWorld {
-    /** the first random generating room's ldPos.*/
+    /** the world's init ldPos.*/
     public static final Position START_RANGE_LDPOS = new Position(0,0);
     //public static final Position START_RANGE_RUPOS = new Position(25, 10);
     public static final Position END_RUPOS = new Position(Engine.WIDTH - 1, Engine.HEIGHT - 1);
     // public static final Room START_RANGE = new Room(START_RANGE_LDPOS, START_RANGE_RUPOS);
-    /** Max room edge length.*/
+    /** Random room edge's max length.*/
     public static final int MAX_EDGE_LENGTH = 8;
-    /** Min room edge length.*/
+    /** Random room edge's min length.*/
     public static final int MIN_EDGE_LENGTH = 3;
     /** the whole Room of RogWord to render.*/
     public static final Room WORLD_ROOM = new Room(START_RANGE_LDPOS, END_RUPOS);
@@ -33,11 +33,17 @@ public class RogWorld {
     /** MAX_AREA_RATE = Rooms Area / WORLD_ROOM Area, to stop spreading rooms.*/
     public static final double MAX_AREA_RATE = 0.5;
 
+    /** the random seed to generate pseudo randomness.*/
     private long seed;
+    /** the random object to generate pseudo random number.*/
     private Random random;
+    /** the generated world.*/
     private TETile[][] rogTiles;
+    /** the already generated rooms to the world */
     private HashSet<Room> rooms;
+    /** the list of rooms waiting to generate adjacent rooms. */
     private List<Room> unSpreadRooms;
+    /** the total areas of the generated rooms.*/
     private int totalRoomsArea;
 
     public RogWorld(String input) {
@@ -276,7 +282,7 @@ public class RogWorld {
     public static void main(String[] args) {
         TERenderer ter = new TERenderer();
         ter.initialize(Engine.WIDTH, Engine.HEIGHT);
-        RogWorld rw = new RogWorld("n54676s");
+        RogWorld rw = new RogWorld("n5233123s");
         rw.generateRogWorld();
         ter.renderFrame(rw.rogTiles);
     }

@@ -59,6 +59,11 @@ public class Engine {
         return finalWorldFrame;
     }
 
+    /** used to Game Sharing.*/
+    public void interactWithRemoteClient(String input) {
+
+    }
+
     public static void main(String[] args) {
         Engine rogEngine = new Engine();
         rogEngine.world = rogEngine.interactWithInputString("n123s");

@@ -5,12 +5,15 @@ import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 import edu.princeton.cs.algs4.Edge;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 
 import static byow.Core.DrawUtils.*;
 import static byow.Core.RandomUtils.*;
+import static byow.Core.Utils.*;
 
-public class RogWorld {
+public class RogWorld implements Serializable {
     /** the world's init ldPos.*/
     public static final Position START_RANGE_LDPOS = new Position(0,0);
     //public static final Position START_RANGE_RUPOS = new Position(25, 10);
@@ -40,21 +43,61 @@ public class RogWorld {
     /** the generated world.*/
     private TETile[][] rogTiles;
     /** the already generated rooms to the world */
-    private HashSet<Room> rooms;
+    private ArrayList<Room> rooms;
     /** the list of rooms waiting to generate adjacent rooms. */
     private List<Room> unSpreadRooms;
     /** the total areas of the generated rooms.*/
     private int totalRoomsArea;
+    /** the Player Avatar.*/
+    private Avatar player;
 
     public RogWorld(String input) {
         this.seed = findTheSeed(input);
-        System.out.println("DEBUG: " + seed);
+        //System.out.println("DEBUG: " + seed);
         this.random = new Random(this.seed);
         this.rogTiles = new TETile[Engine.WIDTH][Engine.HEIGHT];
         this.fillWorldNull();
-        this.rooms = new HashSet<>();
+        this.rooms = new ArrayList<>();
         this.unSpreadRooms = new ArrayList<>();
         this.totalRoomsArea = 0;
+        this.player = null;
+    }
+
+    public void createPlayer(Position pos) {
+        this.player = new Avatar(pos);
+    }
+
+    /** get a random room from the RogWorld.*/
+    private Room getARandomRoom() {
+        int roomIndex = uniform(this.random, rooms.toArray().length);
+        return this.rooms.get(roomIndex);
+    }
+
+    public void createPlayer() {
+        Room avatarRoom = getARandomRoom();
+        Position playerPos = getRandomPos(this.random, avatarRoom.shrinkRoom(1));
+        createPlayer(playerPos);
+    }
+
+    /** move player one step, if hit the wall, don't move.*/
+    public void movePlayer(char operation) {
+        Position playerTargetPos = this.player.getMoveToPos(operation);
+        if (posIsFloor(playerTargetPos)) {
+            this.player.move(operation);
+        }
+    }
+
+    private TETile getTileInPos(Position pos) {
+        int tileX = pos.getX();
+        int tileY = pos.getY();
+        return this.rogTiles[tileX][tileY];
+    }
+
+    private boolean posIsFloor(Position pos) {
+        if (getTileInPos(pos).character() == '·') {
+            return true;
+        }
+        return false;
     }
 
     /** Return the seed (positive long) in the input,
@@ -276,6 +319,15 @@ public class RogWorld {
             }
         }
         this.unSpreadRooms.clear();
+        createPlayer();
+    }
+
+    public TETile[][] getRogTiles() {
+        return this.rogTiles;
+    }
+
+    public void saveRogWorld() throws IOException {
+        writeRogWorld(this);
     }
 
     /** own main method for test.*/
@@ -284,6 +336,7 @@ public class RogWorld {
         ter.initialize(Engine.WIDTH, Engine.HEIGHT);
         RogWorld rw = new RogWorld("n5233123s");
         rw.generateRogWorld();
-        ter.renderFrame(rw.rogTiles);
+        ter.renderFrame(rw.rogTiles, rw.player);
+        System.out.println(rw.player.getCurrPos());
     }
 }

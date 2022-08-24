@@ -1,11 +1,12 @@
 package byow.Core;
 
 
+import java.io.Serializable;
 import java.util.Random;
 
 import static byow.Core.DrawUtils.*;
 
-public class Room {
+public class Room implements Serializable {
     /** the left down position of the room.*/
     private Position ldPos;
     /** the right up(top) position of the room.*/
@@ -18,7 +19,7 @@ public class Room {
 
     /** Edge start from startPos, end at endPos, A room has two edges start from ldPos, two
      * edges start from ruPos.*/
-    class Edge {
+    class Edge implements Serializable {
         /** the length of the edge.*/
         int edgeLen;
         /** the start position of the edge (one of the room's ldPos / ruPos).*/
@@ -119,6 +120,12 @@ public class Room {
     @Override
     public String toString() {
         return "Room: [" + this.ldPos.toString() + this.ruPos.toString() + "]";
+    }
+
+    public Room shrinkRoom(int l) {
+        Position shrinkLdPos = this.ldPos.shiftPosition(l, l);
+        Position shrinkRuPos = this.ruPos.shiftPosition(-l, -l);
+        return new Room(shrinkLdPos, shrinkRuPos);
     }
 
     private int computeRoomArea() {

@@ -1,6 +1,8 @@
 package byow.Core;
 
-public class Position {
+import java.io.Serializable;
+
+public class Position implements Serializable {
     private int x;
     private int y;
 
@@ -12,6 +14,17 @@ public class Position {
     @Override
     public String toString() {
         return "(" + this.x + ", " + this.y + ")";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj.getClass() != Position.class) {
+            return false;
+        }
+        if (this.x == ((Position) obj).getX() && this.y == ((Position) obj).getY()) {
+            return true;
+        }
+        return false;
     }
 
     /** shift the position with dx, dy offsets.*/

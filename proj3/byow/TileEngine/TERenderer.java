@@ -1,9 +1,12 @@
 package byow.TileEngine;
 
+import byow.Core.Avatar;
+import byow.Core.Position;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.io.PipedOutputStream;
 
 /**
  * Utility class for rendering tiles. You do not need to modify this file. You're welcome
@@ -94,6 +97,26 @@ public class TERenderer {
                             + " is null.");
                 }
                 world[x][y].draw(x + xOffset, y + yOffset);
+            }
+        }
+        StdDraw.show();
+    }
+
+    public void renderFrame(TETile[][] world, Avatar player) {
+        int numXTiles = world.length;
+        int numYTiles = world[0].length;
+        StdDraw.clear(new Color(0, 0, 0));
+        for (int x = 0; x < numXTiles; x += 1) {
+            for (int y = 0; y < numYTiles; y += 1) {
+                if (world[x][y] == null) {
+                    throw new IllegalArgumentException("Tile at position x=" + x + ", y=" + y
+                            + " is null.");
+                }
+                if (new Position(x, y).equals(player.getCurrPos())) {
+                    player.getAvatarTile().draw(x + xOffset, y + yOffset);
+                } else {
+                    world[x][y].draw(x + xOffset, y + yOffset);
+                }
             }
         }
         StdDraw.show();

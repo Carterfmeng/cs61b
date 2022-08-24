@@ -263,4 +263,12 @@ Compute the edge attributes and do some edge based operations.
 
 ## Persistence
 
+When the user restarts `byow.Core.Main` and presses L, the world should be in **exactly the same state as it was before the project was terminated**. This state includes the state of the random number generator! More on this in the next section.
+
 ***
+
+### Creative Ideas
+
+***
+
+1. w,a,s,d can push the box(create boxes in the world), and box decide to win (maybe need trigger to win, limited times to push a box....etc)

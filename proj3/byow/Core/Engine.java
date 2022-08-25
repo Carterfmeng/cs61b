@@ -87,11 +87,9 @@ public class Engine {
         //The game start
         System.out.println(gameContinue);
         System.out.println(seed);
-
-        System.out.println(rw.getRogTiles());
         KeyboardInputSource gameInput = new KeyboardInputSource();
-        while (gameContinue ) {
-            this.ter.renderFrame(rw.getRogTiles(),rw.getPlayer());
+        while (gameContinue) {
+            this.ter.renderFrame(rw.getRogTiles(), rw.getPlayer());
             char nextOperation = gameInput.getNextKey();
             System.out.println(nextOperation);
             /** if nextOperation is wasd, move the Avatar, if next operation is :, read next operation, if q is followed, save and quit.*/
@@ -101,6 +99,8 @@ public class Engine {
                 nextOperation = beginInput.getNextKey();
                 if (nextOperation == 'q') {
                     rw.saveRogWorld();
+                    this.ter.renderFrame("");
+                    gameContinue = false;
                 }
             }
         }

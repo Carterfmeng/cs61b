@@ -314,6 +314,9 @@ class Utils {
     }
     /** write RogWorld object to world.txt file, if the file doesn't exist, create one.*/
     static void writeRogWorld(RogWorld world) throws IOException {
+        if (!BYOW_DIR.exists()) {
+            BYOW_DIR.mkdir();
+        }
         if (!WORLD_FILE.exists()) {
             WORLD_FILE.createNewFile();
         }

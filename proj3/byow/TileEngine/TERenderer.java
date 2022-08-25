@@ -20,6 +20,8 @@ public class TERenderer {
     private int height;
     private int xOffset;
     private int yOffset;
+    private static final String TITLE = "CS61B: THE GAME";
+    private static final String[] OPTIONS = {"New Game (N)", "Load Game (L)", "Quit (Q)"};
 
     /**
      * Same functionality as the other initialization method. The only difference is that the xOff
@@ -105,6 +107,8 @@ public class TERenderer {
     public void renderFrame(TETile[][] world, Avatar player) {
         int numXTiles = world.length;
         int numYTiles = world[0].length;
+        Font font = new Font("Monaco", Font.BOLD, TILE_SIZE - 2);
+        StdDraw.setFont(font);
         StdDraw.clear(new Color(0, 0, 0));
         for (int x = 0; x < numXTiles; x += 1) {
             for (int y = 0; y < numYTiles; y += 1) {
@@ -119,6 +123,44 @@ public class TERenderer {
                 }
             }
         }
+        StdDraw.show();
+    }
+
+    public void drawBeginFrame() {
+        StdDraw.clear(Color.black);
+        Font titleFont = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(titleFont);
+        StdDraw.setPenColor(Color.white);
+        StdDraw.text(this.width * 1.0 / 2, this.height * 2.0 / 3, TITLE);
+        Font optionFont = new Font("Monaco", Font.BOLD, 20);
+        StdDraw.setFont(optionFont);
+        for (int i = 0; i < OPTIONS.length; i++) {
+            StdDraw.text(this.width * 1.0 / 2, this.height * 1.0 / 3 - i, OPTIONS[i]);
+        }
+        StdDraw.show();
+    }
+
+    public void drawBeginFrame(String s) {
+        StdDraw.clear(Color.black);
+        Font titleFont = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(titleFont);
+        StdDraw.setPenColor(Color.white);
+        StdDraw.text(this.width * 1.0 / 2, this.height * 2.0 / 3, TITLE);
+        Font optionFont = new Font("Monaco", Font.BOLD, 20);
+        StdDraw.setFont(optionFont);
+        for (int i = 0; i < OPTIONS.length; i++) {
+            StdDraw.text(this.width * 1.0 / 2, this.height * 1.0 / 3 - i, OPTIONS[i]);
+        }
+        StdDraw.text(this.width * 1.0 / 2, this.height * 1.0 / 3 - 4, "Seed: " + s);
+        StdDraw.show();
+    }
+
+    public void renderFrame(String s) {
+        StdDraw.clear(Color.black);
+        Font font = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(font);
+        StdDraw.setPenColor(Color.white);
+        StdDraw.text(this.width * 1.0 / 2, this.height * 2.0 / 3, s);
         StdDraw.show();
     }
 }

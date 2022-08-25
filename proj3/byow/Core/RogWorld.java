@@ -45,7 +45,7 @@ public class RogWorld implements Serializable {
     /** the already generated rooms to the world */
     private ArrayList<Room> rooms;
     /** the list of rooms waiting to generate adjacent rooms. */
-    private List<Room> unSpreadRooms;
+    private ArrayList<Room> unSpreadRooms;
     /** the total areas of the generated rooms.*/
     private int totalRoomsArea;
     /** the Player Avatar.*/
@@ -53,6 +53,21 @@ public class RogWorld implements Serializable {
 
     public RogWorld(String input) {
         this.seed = findTheSeed(input);
+        //System.out.println("DEBUG: " + seed);
+        this.random = new Random(this.seed);
+        this.rogTiles = new TETile[Engine.WIDTH][Engine.HEIGHT];
+        this.fillWorldNull();
+        this.rooms = new ArrayList<>();
+        this.unSpreadRooms = new ArrayList<>();
+        this.totalRoomsArea = 0;
+        this.player = null;
+    }
+
+    public RogWorld() {
+    }
+
+    public RogWorld(long seed) {
+        this.seed = seed;
         //System.out.println("DEBUG: " + seed);
         this.random = new Random(this.seed);
         this.rogTiles = new TETile[Engine.WIDTH][Engine.HEIGHT];
@@ -324,6 +339,10 @@ public class RogWorld implements Serializable {
 
     public TETile[][] getRogTiles() {
         return this.rogTiles;
+    }
+
+    public Avatar getPlayer() {
+        return this.player;
     }
 
     public void saveRogWorld() throws IOException {

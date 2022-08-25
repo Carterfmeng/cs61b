@@ -1,10 +1,13 @@
 package byow.Core;
 
+import byow.Input.KeyboardInputSource;
 import byow.Input.StringInputSource;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
+import edu.princeton.cs.introcs.StdDraw;
 
 import java.io.IOException;
+import java.security.Key;
 import java.util.Locale;
 
 import static byow.Core.Utils.*;
@@ -22,11 +25,88 @@ public class Engine {
         this.world = new TETile[WIDTH][HEIGHT];
     }
 
+    /** helper method for interactWithKeyboard(). if Load(L), seed = -1, if NewGame(N),return seed;
+     * if Quit(q), return -2*/
+    private Long solicitSeed(KeyboardInputSource beginInput, RogWorld rw) {
+        String seed = "";
+        Character nextInput = '_';
+        boolean isSavingSeed = false;
+        boolean gameBeginOrQuit = false;
+        while (beginInput.possibleNextInput() && !nextInput.equals('s') && !gameBeginOrQuit) {
+            nextInput = beginInput.getNextKey();
+            switch (nextInput) {
+                case 'n':
+                    isSavingSeed = true;
+                    this.ter.drawBeginFrame("");
+                    break;
+                case 'l':
+                    if (!isSavingSeed) {
+                        rw = readRogWorld();
+                        seed = "-1";
+                        gameBeginOrQuit = true;
+                    }
+                    break;
+                case 'q':
+                    if (!isSavingSeed) {
+                        this.ter.renderFrame("");
+                        seed = "-2";
+                        gameBeginOrQuit = true;
+                    }
+                    break;
+                default:
+                    if (isSavingSeed) {
+                        if ("0123456789".contains(Character.toString(nextInput))) {
+                            seed += nextInput;
+                            this.ter.drawBeginFrame(seed);
+                        }
+                    }
+            }
+        }
+        gameBeginOrQuit = true;
+        isSavingSeed = false;
+        return Long.parseLong(seed);
+    }
+
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
      */
-    public void interactWithKeyboard() {
+    public void interactWithKeyboard() throws IOException {
+        RogWorld rw = new RogWorld();
+        boolean gameContinue = true;
+        //The logic before enter the game
+        this.ter.drawBeginFrame();
+        KeyboardInputSource beginInput = new KeyboardInputSource();
+        long seed = solicitSeed(beginInput, rw);
+        if (seed > 0) {
+            rw = new RogWorld(seed);
+            rw.generateRogWorld();
+        } else if (seed == -2) {
+            gameContinue = false;
+        } else if (seed == -1) {
+            // Java is Pass By Value
+            rw = readRogWorld();
+        }
+        //The game start
+        System.out.println(gameContinue);
+        System.out.println(seed);
+
+        System.out.println(rw.getRogTiles());
+        KeyboardInputSource gameInput = new KeyboardInputSource();
+        while (gameContinue ) {
+            this.ter.renderFrame(rw.getRogTiles(),rw.getPlayer());
+            char nextOperation = gameInput.getNextKey();
+            System.out.println(nextOperation);
+            /** if nextOperation is wasd, move the Avatar, if next operation is :, read next operation, if q is followed, save and quit.*/
+            if (operationIsMove(nextOperation)) {
+                rw.movePlayer(nextOperation);
+            } else if (nextOperation == ':') {
+                nextOperation = beginInput.getNextKey();
+                if (nextOperation == 'q') {
+                    rw.saveRogWorld();
+                }
+            }
+        }
     }
 
     /**
@@ -90,7 +170,6 @@ public class Engine {
                 }
             }
         }
-        this.ter.renderFrame(rw.getRogTiles());
         finalWorldFrame = rw.getRogTiles();
         return finalWorldFrame;
     }
@@ -104,6 +183,15 @@ public class Engine {
 
     /** used to Game Sharing.*/
     public void interactWithRemoteClient(String input) {
+
+    }
+
+    public static void main(String[] args) {
+        /**
+        StringInputSource inputSource = new StringInputSource("12".substring(2));
+        System.out.println(inputSource.getInput().length());
+        System.out.println(inputSource.getIndex());
+         */
 
     }
 }

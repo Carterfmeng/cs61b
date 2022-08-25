@@ -21,4 +21,11 @@ public class StringInputSource implements InputSource {
         return index < input.length();
     }
 
+    public String getInput() {
+        return input;
+    }
+
+    public int getIndex() {
+        return index;
+    }
 }

@@ -4,10 +4,8 @@ import byow.Input.KeyboardInputSource;
 import byow.Input.StringInputSource;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
-import edu.princeton.cs.introcs.StdDraw;
 
 import java.io.IOException;
-import java.security.Key;
 import java.util.Locale;
 
 import static byow.Core.Utils.*;
@@ -27,7 +25,7 @@ public class Engine {
 
     /** helper method for interactWithKeyboard(). if Load(L), seed = -1, if NewGame(N),return seed;
      * if Quit(q), return -2*/
-    private Long solicitSeed(KeyboardInputSource beginInput, RogWorld rw) {
+    private Long solicitSeed(KeyboardInputSource beginInput) {
         String seed = "";
         Character nextInput = '_';
         boolean isSavingSeed = false;
@@ -41,7 +39,6 @@ public class Engine {
                     break;
                 case 'l':
                     if (!isSavingSeed) {
-                        rw = readRogWorld();
                         seed = "-1";
                         gameBeginOrQuit = true;
                     }
@@ -77,7 +74,7 @@ public class Engine {
         //The logic before enter the game
         this.ter.drawBeginFrame();
         KeyboardInputSource beginInput = new KeyboardInputSource();
-        long seed = solicitSeed(beginInput, rw);
+        long seed = solicitSeed(beginInput);
         if (seed > 0) {
             rw = new RogWorld(seed);
             rw.generateRogWorld();
